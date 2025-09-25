@@ -3,7 +3,7 @@
  */
 package com.pablocompany.proyectono1lfp;
 
-import java.util.Scanner;
+import com.pablocompany.proyectono1lfp.frontend.aplicacion.MenuPrincipal;
 
 /**
  *
@@ -14,18 +14,8 @@ public class ProyectoNo1LFP {
     public static void main(String[] args) {
 
         //Prueba de comparacion de expresiones regulares
-        System.out.println("Escriba ");
-
-        Scanner prueba = new Scanner(System.in);
-
-        String pruebaPalabra = prueba.nextLine().trim();
-
-        if (pruebaPalabra.matches("^a(a|b|c|d|e)*$")) {
-
-            System.out.println("Se coincide");
-        } else {
-            System.out.println("no coincide");
-        }
+        MenuPrincipal menu = new MenuPrincipal();
+        menu.setVisible(true);
 
     }
 

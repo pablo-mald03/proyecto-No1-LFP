@@ -10,4 +10,22 @@
         <maven.compiler.release>21</maven.compiler.release>
         <exec.mainClass>com.pablocompany.proyectono1lfp.ProyectoNo1LFP</exec.mainClass>
     </properties>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.pablocompany.proyectono1lfp.ProyectoNo1LFP</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    
 </project>
