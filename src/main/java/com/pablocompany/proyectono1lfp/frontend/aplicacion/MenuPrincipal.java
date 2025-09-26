@@ -4,57 +4,62 @@
  */
 package com.pablocompany.proyectono1lfp.frontend.aplicacion;
 
+import com.pablocompany.proyectono1lfp.backend.analizadorlexico.AnalizadorLexico;
+import com.pablocompany.proyectono1lfp.backend.analizadorlexicorecursos.LectorEntradas;
 import com.pablocompany.proyectono1lfp.backend.analizadorlexicorecursos.ManejadorArchivos;
 import com.pablocompany.proyectono1lfp.backend.aplicacion.ColocarFondos;
 import com.pablocompany.proyectono1lfp.backend.aplicacion.IlustrarLabels;
 import com.pablocompany.proyectono1lfp.backend.excepciones.AnalizadorLexicoException;
+import com.pablocompany.proyectono1lfp.backend.excepciones.ConfigException;
+import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorEncontradoException;
+import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorPuntualException;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.text.BadLocationException;
 
 /**
  *
  * @author pablo
  */
 public class MenuPrincipal extends javax.swing.JFrame {
-    
 
-     //Variable que permite saber que menu de operaciones se despliegara
+    //Variable que permite saber que menu de operaciones se despliegara
     private int gestionVentanas;
 
     //instancia que permite subir archivos de texto
     private ManejadorArchivos manipuladorDirectorios;
- //   private LectorEntradas leerEntradas;
+    private LectorEntradas leerEntradas;
 
     //Atributo que permite saber si el archivo ya fue cargado
     //true si el archivo ya se cargo
     //false si el archivo no se ha cargado
     private boolean yaCargado;
-    
+
     /**
      * Creates new form MenuPrincipal
      */
     public MenuPrincipal() {
         initComponents();
-        
+
         this.setLocationRelativeTo(null);
-        
-      //  ColocarFondos pintarPanel = new ColocarFondos(this, this.panelPrincipal);
 
-      //  pintarPanel.pintarPaneles("/com/pablocompany/proyectono1/recursosapp/images/overlay2.png");
+        ColocarFondos pintarPanel = new ColocarFondos(this, this.panelPrincipal);
 
-       // ImageIcon icono = new ImageIcon(getClass().getResource("/com/pablocompany/proyectono1/recursosapp/images/perfildef.png"));
+        pintarPanel.pintarPaneles("/com/pablocompany/proyectono1/recursosapp/images/overlay2.png");
+
+        ImageIcon icono = new ImageIcon(getClass().getResource("/com/pablocompany/proyectono1/recursosapp/images/perfildef.png"));
 
         IlustrarLabels labelPerfil = new IlustrarLabels(this.panelBarraPrincipal, 60, 60, "", this.lblPerfil);
-     //   labelPerfil.cambiarLabel(icono);
+        labelPerfil.cambiarLabel(icono);
 
-       // ImageIcon iconoMedio = new ImageIcon(getClass().getResource("/com/pablocompany/practicano1/recursosapp/images/insertar.png"));
+        ImageIcon iconoMedio = new ImageIcon(getClass().getResource("/com/pablocompany/proyectono1/recursosapp/images/insertar.png"));
 
         IlustrarLabels labelMedio = new IlustrarLabels(this.panelBarraPrincipal, 50, 50, "", this.lblEleccion);
-       // labelMedio.cambiarLabel(iconoMedio);
+        labelMedio.cambiarLabel(iconoMedio);
 
         this.txtLogBusquedas.setEditable(false);
         this.txtAreaDirectorioArchivo.setEditable(false);
@@ -62,21 +67,209 @@ public class MenuPrincipal extends javax.swing.JFrame {
         this.textEdicionArchivo.setEditable(true);
         this.textEdicionArchivo.setCaretColor(Color.BLACK);
 
-       // this.gestionVentanas = 0;
-       // this.yaCargado = false;
+        this.gestionVentanas = 0;
+        this.yaCargado = false;
         this.txtBusquedas.setVisible(false);
 
         //Se instancia la clase para poder operar con archivos de texto
-       /* this.manipuladorDirectorios = new ManejadorArchivos();
-        try {
-            this.leerEntradas = new LectorEntradas();
-        } catch (ConfigException ex) {
-            System.out.println("Error de Lectura" + ex.getMessage());
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de apertura archivo", JOptionPane.ERROR_MESSAGE);
-        }*/
+        this.manipuladorDirectorios = new ManejadorArchivos();
+
+        //Instanica que permite leer los archivos
+        this.leerEntradas = new LectorEntradas();
+
     }
 
+    //===========================================APARTADO DE METODOS QUE SE UTILIZAN PARA DINAMIZAR LA UI===========================================
+    //Metodo de UI que permite nombrar algo y no permite vacios
+    private String pedirNombre(String mensaje) {
+        String entrada = JOptionPane.showInputDialog(null, mensaje);
+
+        // Si el usuario presiona "Cancelar" o deja vacío
+        if (entrada == null || entrada.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No puedes dejarlo en blanco. Intenta de nuevo.");
+            return pedirNombre(mensaje);
+        }
+
+        return entrada.trim().replace(" ", "_");
+    }
+
+    //Metodo que sirve para poder mostrar la seleccion de la busqueda de palabras
+    //1 busqueda de palabras
+    //0 reinicia la UI PRINCIPAL
+    public void mostrarBusquedas() {
+
+        ImageIcon iconoMedio = new ImageIcon(getClass().getResource("/com/pablocompany/proyectono1/recursosapp/images/busquedaDatos.png"));
+
+        IlustrarLabels labelMedio = new IlustrarLabels(this.panelBarraPrincipal, 50, 50, "", this.lblEleccion);
+        labelMedio.cambiarLabel(iconoMedio);
+
+        this.lblEleccionesDadas.setText("Busqueda de Patrones");
+
+        //Reinicia el permiso para accionar botones
+        this.gestionVentanas = 1;
+
+        operarBusquedas();
+
+        this.btnConfig.setBackground(new Color(0x323844));
+        this.btnGenerarReportes.setBackground(new Color(0x323844));
+        this.btnBusquedaPatrones.setBackground(new Color(0x2DB20C));
+
+    }
+
+    //Metodo que genera la interaccion entre modificar el archivo de configuracion
+    public void iniciarModoDepuracion() {
+
+        ImageIcon iconoMedio = new ImageIcon(getClass().getResource("/com/pablocompany/proyectono1/recursosapp/images/subirArchivo.png"));
+
+        IlustrarLabels labelMedio = new IlustrarLabels(this.panelBarraPrincipal, 50, 50, "", this.lblEleccion);
+        labelMedio.cambiarLabel(iconoMedio);
+        this.lblEleccionesDadas.setText("Editar Configuracion");
+
+        this.btnBusquedaPatrones.setBackground(new Color(0x323844));
+        this.btnGenerarReportes.setBackground(new Color(0x323844));
+        this.btnConfig.setBackground(new Color(0x2DB20C));
+        modoDepuracion();
+
+    }
+
+    //Metodo que genera la interaccion entre generar reportes
+    public void generarReportes() {
+
+        ImageIcon iconoMedio = new ImageIcon(getClass().getResource("/com/pablocompany/proyectono1/recursosapp/images/reportes.png"));
+
+        IlustrarLabels labelMedio = new IlustrarLabels(this.panelBarraPrincipal, 50, 50, "", this.lblEleccion);
+        labelMedio.cambiarLabel(iconoMedio);
+        this.lblEleccionesDadas.setText("Generar Reportes");
+
+        this.btnBusquedaPatrones.setBackground(new Color(0x323844));
+        this.btnConfig.setBackground(new Color(0x323844));
+        this.btnGenerarReportes.setBackground(new Color(0x2DB20C));
+        operarReportes();
+
+    }
+
+    //Metodo que se encarga de regresar a la interfaz inicial
+    public void regresarInicio() {
+
+        ImageIcon iconoMedio = new ImageIcon(getClass().getResource("/com/pablocompany/proyectono1/recursosapp/images/insertar.png"));
+
+        IlustrarLabels labelMedio = new IlustrarLabels(this.panelBarraPrincipal, 50, 50, "", this.lblEleccion);
+        labelMedio.cambiarLabel(iconoMedio);
+        this.lblEleccionesDadas.setText("Edicion de Archivos");
+
+        //Reinicia el permiso para accionar botones
+        this.gestionVentanas = 0;
+
+        this.btnBusquedaPatrones.setBackground(new Color(0x323844));
+        this.btnConfig.setBackground(new Color(0x323844));
+        this.btnGenerarReportes.setBackground(new Color(0x323844));
+
+        reestablecerUI();
+
+    }
+
+    //===================================FIN DEL APARTADO DE METODOS QUE SE UTILIZAN PARA DINAMIZAR LA UI===========================================
+    //Metodo que ayuda a poder tomar decisiones en el menu
+    public boolean tomarDecision(String mensaje, String Titulo) {
+        int opcion = JOptionPane.showConfirmDialog(
+                this,
+                mensaje,
+                Titulo,
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        );
+
+        return opcion == JOptionPane.YES_OPTION;
+    }
+
+    //========================================REGION DE METODOS UTILIZADOS PARA CADA FUNCIONALIDAD==============================
+    //Metodo que se utiliza para manejar todos los componentes y funciones previas al muestreo de busquedas
+    public void operarBusquedas() {
+
+        this.textEdicionArchivo.setEditable(false);
+        this.btnAnalisis.setVisible(false);
+        this.scrollErroresLog.setVisible(false);
+        this.scrollBusquedas.setVisible(true);
+        this.txtBusquedas.setText("");
+        this.txtLogBusquedas.setText("");
+        this.lblMostrarError.setText("Resultados de busqueda:");
+        this.lblAnalisis.setText("Busqueda de patrones:");
+        this.txtBusquedas.setVisible(true);
+        this.btnSubirArchivo.setEnabled(false);
+        this.btnGuardarArchivo.setText("Buscar Patron");
+        this.btnQuitarArchivo.setEnabled(false);
+        this.btnGuardarArchivo.setEnabled(true);
+
+        this.txtBusquedas.requestFocusInWindow();
+
+    }
+
+    //Metodo que se utiliza para manejar todos los componentes y funciones previas a la configuracion de instrucciones
+    public void modoDepuracion() {
+        //Se despliega la ventana emergente para editar la configuracion
+        /* EditarConfiguracion dialog = new EditarConfiguracion(this, true, leerEntradas, textEdicionArchivo, textLogErrores);
+        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+
+                if (gestionVentanas == 0) {
+                    regresarInicio();
+                }
+
+                if (gestionVentanas == 1) {
+                    mostrarBusquedas();
+                }
+
+            }
+        });
+        dialog.setVisible(true);*/
+
+    }
+
+    //Metodo que se utiliza para manejar todos los componentes y funciones previas a la generacion de reportes
+    public void operarReportes() {
+        //Se despliega la ventana emergente para La generacion de reportes
+        /* MostrarReportes dialog = new MostrarReportes(this, true, leerEntradas);
+        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+
+                if (gestionVentanas == 0) {
+                    regresarInicio();
+                }
+
+                if (gestionVentanas == 1) {
+                    mostrarBusquedas();
+                }
+
+            }
+        });
+        dialog.setVisible(true);*/
+
+    }
+
+    //Metodo que se utiliza para manejar todos los componentes y funciones previas a la generacion de reportes
+    public void reestablecerUI() {
+        this.textEdicionArchivo.setEditable(true);
+        this.btnAnalisis.setVisible(true);
+        this.txtLogBusquedas.setText("");
+        this.scrollErroresLog.setVisible(true);
+        this.scrollBusquedas.setVisible(false);
+        this.txtBusquedas.setText("");
+        this.lblAnalisis.setText("Analizar Manualmente:");
+        this.lblMostrarError.setText("Errores Encontrados:");
+        this.txtBusquedas.setVisible(false);
+        this.btnSubirArchivo.setEnabled(true);
+        this.btnGuardarArchivo.setText("Guardar Texto");
+        this.btnQuitarArchivo.setEnabled(true);
+
+        if (this.yaCargado) {
+            this.btnGuardarArchivo.setEnabled(false);
+        }
+
+    }
+
+    //========================================FIN DE LA REGION DE METODOS UTILIZADOS PARA CADA FUNCIONALIDAD==============================
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -118,10 +311,15 @@ public class MenuPrincipal extends javax.swing.JFrame {
         btnGenerarReportes = new javax.swing.JButton();
         btnConfig = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Analizador Lexico");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
-        panelBarraPrincipal.setBackground(new java.awt.Color(50, 56, 68));
+        panelBarraPrincipal.setBackground(new java.awt.Color(57, 5, 87));
         panelBarraPrincipal.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(0, 0, 0)));
 
         lblAdmin.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
@@ -132,6 +330,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         lblEleccionesDadas.setForeground(new java.awt.Color(255, 255, 255));
         lblEleccionesDadas.setText("Edicion de Archivos");
 
+        lblHome.setBackground(new java.awt.Color(71, 7, 110));
         lblHome.setPreferredSize(new java.awt.Dimension(60, 60));
 
         javax.swing.GroupLayout panelBarraPrincipalLayout = new javax.swing.GroupLayout(panelBarraPrincipal);
@@ -196,6 +395,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         btnSubirArchivo.setBackground(new java.awt.Color(48, 148, 92));
         btnSubirArchivo.setFont(new java.awt.Font("Liberation Sans", 1, 22)); // NOI18N
         btnSubirArchivo.setForeground(new java.awt.Color(255, 255, 255));
+        btnSubirArchivo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/pablocompany/proyectono1/recursosapp/images/uploadFileIcon.png"))); // NOI18N
         btnSubirArchivo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSubirArchivoActionPerformed(evt);
@@ -215,6 +415,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         btnQuitarArchivo.setBackground(new java.awt.Color(148, 47, 47));
         btnQuitarArchivo.setFont(new java.awt.Font("Liberation Sans", 1, 22)); // NOI18N
         btnQuitarArchivo.setForeground(new java.awt.Color(255, 255, 255));
+        btnQuitarArchivo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/pablocompany/proyectono1/recursosapp/images/eliminarIcon.png"))); // NOI18N
         btnQuitarArchivo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnQuitarArchivoActionPerformed(evt);
@@ -233,11 +434,11 @@ public class MenuPrincipal extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(labelDatos, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)
                             .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING))
-                        .addGap(12, 12, 12)
-                        .addComponent(btnSubirArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnSubirArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
                         .addComponent(btnQuitarArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -248,9 +449,9 @@ public class MenuPrincipal extends javax.swing.JFrame {
                 .addComponent(lblTitulo)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnQuitarArchivo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
-                    .addComponent(btnSubirArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnSubirArchivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnQuitarArchivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -269,7 +470,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         scrollErroresLog.setViewportView(textLogErrores);
 
         jPanel2.add(scrollErroresLog);
-        scrollErroresLog.setBounds(10, 160, 650, 380);
+        scrollErroresLog.setBounds(10, 160, 660, 380);
 
         lblMostrarError.setFont(new java.awt.Font("Liberation Sans", 1, 32)); // NOI18N
         lblMostrarError.setForeground(new java.awt.Color(83, 31, 11));
@@ -324,9 +525,9 @@ public class MenuPrincipal extends javax.swing.JFrame {
         scrollBusquedas.setViewportView(txtLogBusquedas);
 
         jPanel2.add(scrollBusquedas);
-        scrollBusquedas.setBounds(10, 160, 650, 380);
+        scrollBusquedas.setBounds(10, 160, 660, 380);
 
-        barraLateral.setBackground(new java.awt.Color(50, 56, 68));
+        barraLateral.setBackground(new java.awt.Color(57, 5, 87));
         barraLateral.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(0, 0, 0)));
         barraLateral.setForeground(new java.awt.Color(0, 0, 0));
 
@@ -357,7 +558,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         btnConfig.setBackground(new java.awt.Color(50, 56, 68));
         btnConfig.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
         btnConfig.setForeground(new java.awt.Color(255, 255, 255));
-        btnConfig.setText("Editar Configuracion");
+        btnConfig.setText("Iniciar Modo Depuracion");
         btnConfig.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(255, 255, 255)));
         btnConfig.setFocusable(false);
         btnConfig.addActionListener(new java.awt.event.ActionListener() {
@@ -421,7 +622,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 556, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(barraLateral, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -432,11 +633,11 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
     private void textEdicionArchivoKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textEdicionArchivoKeyReleased
 
-       /* int code = evt.getKeyCode();
+        int code = evt.getKeyCode();
         if (code == KeyEvent.VK_CONTROL || code == KeyEvent.VK_SHIFT
-            || code == KeyEvent.VK_ALT
-            || code == KeyEvent.VK_LEFT || code == KeyEvent.VK_RIGHT || code == KeyEvent.VK_UP || code == KeyEvent.VK_DOWN
-            || code == KeyEvent.VK_TAB || code == KeyEvent.VK_CAPS_LOCK) {
+                || code == KeyEvent.VK_ALT
+                || code == KeyEvent.VK_LEFT || code == KeyEvent.VK_RIGHT || code == KeyEvent.VK_UP || code == KeyEvent.VK_DOWN
+                || code == KeyEvent.VK_TAB || code == KeyEvent.VK_CAPS_LOCK) {
             return; // ignorar estas teclas
         }
 
@@ -455,12 +656,12 @@ public class MenuPrincipal extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de Carga", JOptionPane.ERROR_MESSAGE);
         } catch (BadLocationException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de pintado", JOptionPane.ERROR_MESSAGE);
-        }*/
+        }
     }//GEN-LAST:event_textEdicionArchivoKeyReleased
 
     private void btnSubirArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubirArchivoActionPerformed
 
-    /*    try {
+        try {
             //Ejecuta la accion para Elegir el archivo
 
             if (this.manipuladorDirectorios.elegirArchivoEntrada()) {
@@ -484,13 +685,13 @@ public class MenuPrincipal extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de Ejecucion", JOptionPane.ERROR_MESSAGE);
         } catch (ConfigException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de Carga", JOptionPane.ERROR_MESSAGE);
-        }*/
+        }
 
     }//GEN-LAST:event_btnSubirArchivoActionPerformed
 
     private void btnQuitarArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnQuitarArchivoActionPerformed
         //Permite cerrar el archivo que ya fue editado durante el proceso guardando los datos
-       /* if (this.yaCargado) {
+        if (this.yaCargado) {
 
             if (tomarDecision("Deseas cerrar este archivo cargado\nSe guardaran todos los cambios hechos", "Confirmar cierre")) {
 
@@ -515,7 +716,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
             }
         } else {
             JOptionPane.showMessageDialog(this, "Todavia no has cargado ningun archivo para poder cerrarlo", "No hay ningun archivo cargado aun", JOptionPane.INFORMATION_MESSAGE);
-        }*/
+        }
 
     }//GEN-LAST:event_btnQuitarArchivoActionPerformed
 
@@ -525,7 +726,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
     private void btnGuardarArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarArchivoActionPerformed
         //EJECUTA LAS ACCIONES RESPECTIVAS PARA PODER GUARDAR UN ARCHIVO
-/*
+
         if (this.gestionVentanas == 0) {
             if (this.textEdicionArchivo.getText().trim().isBlank()) {
                 JOptionPane.showMessageDialog(this, "No puedes guardar un archivo en blanco\nEscribe algo para poder guardarlo", "No tienes contenido definido", JOptionPane.INFORMATION_MESSAGE);
@@ -585,12 +786,12 @@ public class MenuPrincipal extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, ex1.getMessage(), "Patron no Encontrado", JOptionPane.INFORMATION_MESSAGE);
             }
 
-        }*/
+        }
     }//GEN-LAST:event_btnGuardarArchivoActionPerformed
 
     private void btnAnalisisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnalisisActionPerformed
         //Boton manual que permite analizar el texto
-       /* if (this.textEdicionArchivo.getText().isBlank()) {
+        if (this.textEdicionArchivo.getText().isBlank()) {
             return;
         }
 
@@ -605,7 +806,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de Carga", JOptionPane.ERROR_MESSAGE);
         } catch (BadLocationException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de pintado", JOptionPane.ERROR_MESSAGE);
-        }*/
+        }
     }//GEN-LAST:event_btnAnalisisActionPerformed
 
     private void txtLogBusquedasKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtLogBusquedasKeyReleased
@@ -614,19 +815,26 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
     private void btnBusquedaPatronesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBusquedaPatronesActionPerformed
         //Lleva a la opcion de buscar palabras
-      //  mostrarBusquedas();
+        mostrarBusquedas();
     }//GEN-LAST:event_btnBusquedaPatronesActionPerformed
 
     private void btnGenerarReportesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarReportesActionPerformed
         //Boton que permite generar los reportes
-       // generarReportes();
+        // generarReportes();
 
     }//GEN-LAST:event_btnGenerarReportesActionPerformed
 
     private void btnConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfigActionPerformed
         //Boton que despliega las opciones para editar el config
-        //cambiarConfiguracion();
+        //iniciarModoDepuracion();
     }//GEN-LAST:event_btnConfigActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        //Codiciona que se debe de confirmar si se quiere cerrar la aplicacion
+        if (tomarDecision("Esta seguro que quieres salir de la aplicacion?", "Salir de la aplicacion")) {
+            System.exit(0);
+        }
+    }//GEN-LAST:event_formWindowClosing
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
