@@ -8,6 +8,7 @@ import com.pablocompany.proyectono1lfp.backend.analizadorlexico.AnalizadorLexico
 import com.pablocompany.proyectono1lfp.backend.analizadorlexicorecursos.LectorEntradas;
 import com.pablocompany.proyectono1lfp.backend.analizadorlexicorecursos.ManejadorArchivos;
 import com.pablocompany.proyectono1lfp.backend.aplicacion.ColocarFondos;
+import com.pablocompany.proyectono1lfp.backend.aplicacion.EditorTexto;
 import com.pablocompany.proyectono1lfp.backend.aplicacion.IlustrarLabels;
 import com.pablocompany.proyectono1lfp.backend.excepciones.AnalizadorLexicoException;
 import com.pablocompany.proyectono1lfp.backend.excepciones.ConfigException;
@@ -15,7 +16,6 @@ import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorEncontradoExcept
 import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorPuntualException;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -39,6 +39,9 @@ public class MenuPrincipal extends javax.swing.JFrame {
     //false si el archivo no se ha cargado
     private boolean yaCargado;
 
+    //Atributo que permite darle formato al textPane para poder enumerar las lineas y columnas
+    private EditorTexto editor;
+
     /**
      * Creates new form MenuPrincipal
      */
@@ -59,6 +62,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         ImageIcon iconoMedio = new ImageIcon(getClass().getResource("/com/pablocompany/proyectono1/recursosapp/images/insertar.png"));
 
         IlustrarLabels labelMedio = new IlustrarLabels(this.panelBarraPrincipal, 50, 50, "", this.lblEleccion);
+
         labelMedio.cambiarLabel(iconoMedio);
 
         this.txtLogBusquedas.setEditable(false);
@@ -70,6 +74,8 @@ public class MenuPrincipal extends javax.swing.JFrame {
         this.gestionVentanas = 0;
         this.yaCargado = false;
         this.txtBusquedas.setVisible(false);
+
+        editor = new EditorTexto(this.textEdicionArchivo, this.scrollAreaEdicion, this.labelLayout);
 
         //Se instancia la clase para poder operar con archivos de texto
         this.manipuladorDirectorios = new ManejadorArchivos();
@@ -110,9 +116,9 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         operarBusquedas();
 
-        this.btnConfig.setBackground(new Color(0x323844));
-        this.btnGenerarReportes.setBackground(new Color(0x323844));
-        this.btnBusquedaPatrones.setBackground(new Color(0x2DB20C));
+        this.btnDepuracion.setBackground(new Color(0x533F59));
+        this.btnGenerarReportes.setBackground(new Color(0x533F59));
+        this.btnBusquedaPatrones.setBackground(new Color(0x4D6E4C));
 
     }
 
@@ -125,9 +131,9 @@ public class MenuPrincipal extends javax.swing.JFrame {
         labelMedio.cambiarLabel(iconoMedio);
         this.lblEleccionesDadas.setText("Editar Configuracion");
 
-        this.btnBusquedaPatrones.setBackground(new Color(0x323844));
-        this.btnGenerarReportes.setBackground(new Color(0x323844));
-        this.btnConfig.setBackground(new Color(0x2DB20C));
+        this.btnBusquedaPatrones.setBackground(new Color(0x533F59));
+        this.btnGenerarReportes.setBackground(new Color(0x533F59));
+        this.btnDepuracion.setBackground(new Color(0x4D6E4C));
         modoDepuracion();
 
     }
@@ -141,9 +147,9 @@ public class MenuPrincipal extends javax.swing.JFrame {
         labelMedio.cambiarLabel(iconoMedio);
         this.lblEleccionesDadas.setText("Generar Reportes");
 
-        this.btnBusquedaPatrones.setBackground(new Color(0x323844));
-        this.btnConfig.setBackground(new Color(0x323844));
-        this.btnGenerarReportes.setBackground(new Color(0x2DB20C));
+        this.btnBusquedaPatrones.setBackground(new Color(0x533F59));
+        this.btnDepuracion.setBackground(new Color(0x533F59));
+        this.btnGenerarReportes.setBackground(new Color(0x4D6E4C));
         operarReportes();
 
     }
@@ -160,9 +166,9 @@ public class MenuPrincipal extends javax.swing.JFrame {
         //Reinicia el permiso para accionar botones
         this.gestionVentanas = 0;
 
-        this.btnBusquedaPatrones.setBackground(new Color(0x323844));
-        this.btnConfig.setBackground(new Color(0x323844));
-        this.btnGenerarReportes.setBackground(new Color(0x323844));
+        this.btnBusquedaPatrones.setBackground(new Color(0x533F59));
+        this.btnDepuracion.setBackground(new Color(0x533F59));
+        this.btnGenerarReportes.setBackground(new Color(0x533F59));
 
         reestablecerUI();
 
@@ -309,7 +315,8 @@ public class MenuPrincipal extends javax.swing.JFrame {
         barraLateral = new javax.swing.JPanel();
         btnBusquedaPatrones = new javax.swing.JButton();
         btnGenerarReportes = new javax.swing.JButton();
-        btnConfig = new javax.swing.JButton();
+        btnDepuracion = new javax.swing.JButton();
+        labelLayout = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Analizador Lexico");
@@ -319,7 +326,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
             }
         });
 
-        panelBarraPrincipal.setBackground(new java.awt.Color(57, 5, 87));
+        panelBarraPrincipal.setBackground(new java.awt.Color(45, 1, 61));
         panelBarraPrincipal.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(0, 0, 0)));
 
         lblAdmin.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
@@ -331,7 +338,13 @@ public class MenuPrincipal extends javax.swing.JFrame {
         lblEleccionesDadas.setText("Edicion de Archivos");
 
         lblHome.setBackground(new java.awt.Color(71, 7, 110));
+        lblHome.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/pablocompany/proyectono1/recursosapp/images/home2.png"))); // NOI18N
         lblHome.setPreferredSize(new java.awt.Dimension(60, 60));
+        lblHome.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblHomeMouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelBarraPrincipalLayout = new javax.swing.GroupLayout(panelBarraPrincipal);
         panelBarraPrincipal.setLayout(panelBarraPrincipalLayout);
@@ -346,7 +359,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
                 .addComponent(lblEleccion, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblEleccionesDadas, javax.swing.GroupLayout.PREFERRED_SIZE, 382, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 408, Short.MAX_VALUE)
                 .addComponent(lblHome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(17, 17, 17))
         );
@@ -430,28 +443,29 @@ public class MenuPrincipal extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 341, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(labelDatos, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnSubirArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnQuitarArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(labelDatos, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnSubirArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnQuitarArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(labelDatos)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblTitulo)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnSubirArchivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnQuitarArchivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(labelDatos)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblTitulo)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(btnQuitarArchivo)
+                        .addComponent(btnSubirArchivo)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -470,14 +484,14 @@ public class MenuPrincipal extends javax.swing.JFrame {
         scrollErroresLog.setViewportView(textLogErrores);
 
         jPanel2.add(scrollErroresLog);
-        scrollErroresLog.setBounds(10, 160, 660, 380);
+        scrollErroresLog.setBounds(20, 150, 680, 410);
 
         lblMostrarError.setFont(new java.awt.Font("Liberation Sans", 1, 32)); // NOI18N
         lblMostrarError.setForeground(new java.awt.Color(83, 31, 11));
         lblMostrarError.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblMostrarError.setText("Errores Encontrados:");
         jPanel2.add(lblMostrarError);
-        lblMostrarError.setBounds(10, 120, 650, 37);
+        lblMostrarError.setBounds(10, 110, 700, 37);
 
         btnGuardarArchivo.setBackground(new java.awt.Color(19, 115, 146));
         btnGuardarArchivo.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
@@ -488,7 +502,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
             }
         });
         jPanel2.add(btnGuardarArchivo);
-        btnGuardarArchivo.setBounds(420, 60, 203, 50);
+        btnGuardarArchivo.setBounds(480, 50, 203, 50);
 
         btnAnalisis.setBackground(new java.awt.Color(46, 136, 80));
         btnAnalisis.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
@@ -499,20 +513,20 @@ public class MenuPrincipal extends javax.swing.JFrame {
             }
         });
         jPanel2.add(btnAnalisis);
-        btnAnalisis.setBounds(30, 60, 203, 50);
+        btnAnalisis.setBounds(40, 50, 203, 50);
 
         txtBusquedas.setBackground(new java.awt.Color(228, 228, 228));
         txtBusquedas.setFont(new java.awt.Font("Liberation Serif", 0, 24)); // NOI18N
         txtBusquedas.setForeground(new java.awt.Color(63, 58, 58));
         jPanel2.add(txtBusquedas);
-        txtBusquedas.setBounds(30, 60, 370, 50);
+        txtBusquedas.setBounds(40, 50, 410, 50);
 
-        lblAnalisis.setFont(new java.awt.Font("Liberation Sans", 1, 32)); // NOI18N
+        lblAnalisis.setFont(new java.awt.Font("Liberation Sans", 1, 30)); // NOI18N
         lblAnalisis.setForeground(new java.awt.Color(83, 31, 11));
         lblAnalisis.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblAnalisis.setText("Analizar Manualmente:");
         jPanel2.add(lblAnalisis);
-        lblAnalisis.setBounds(10, 10, 650, 37);
+        lblAnalisis.setBounds(10, 10, 700, 36);
 
         txtLogBusquedas.setBackground(new java.awt.Color(228, 228, 228));
         txtLogBusquedas.setFont(new java.awt.Font("Liberation Serif", 1, 20)); // NOI18N
@@ -525,13 +539,13 @@ public class MenuPrincipal extends javax.swing.JFrame {
         scrollBusquedas.setViewportView(txtLogBusquedas);
 
         jPanel2.add(scrollBusquedas);
-        scrollBusquedas.setBounds(10, 160, 660, 380);
+        scrollBusquedas.setBounds(20, 150, 680, 410);
 
-        barraLateral.setBackground(new java.awt.Color(57, 5, 87));
+        barraLateral.setBackground(new java.awt.Color(45, 1, 61));
         barraLateral.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(0, 0, 0)));
         barraLateral.setForeground(new java.awt.Color(0, 0, 0));
 
-        btnBusquedaPatrones.setBackground(new java.awt.Color(50, 56, 68));
+        btnBusquedaPatrones.setBackground(new java.awt.Color(83, 63, 89));
         btnBusquedaPatrones.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
         btnBusquedaPatrones.setForeground(new java.awt.Color(255, 255, 255));
         btnBusquedaPatrones.setText("Busqueda de Patrones");
@@ -543,7 +557,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
             }
         });
 
-        btnGenerarReportes.setBackground(new java.awt.Color(50, 56, 68));
+        btnGenerarReportes.setBackground(new java.awt.Color(83, 63, 89));
         btnGenerarReportes.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
         btnGenerarReportes.setForeground(new java.awt.Color(255, 255, 255));
         btnGenerarReportes.setText("Generar Reportes");
@@ -555,15 +569,15 @@ public class MenuPrincipal extends javax.swing.JFrame {
             }
         });
 
-        btnConfig.setBackground(new java.awt.Color(50, 56, 68));
-        btnConfig.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
-        btnConfig.setForeground(new java.awt.Color(255, 255, 255));
-        btnConfig.setText("Iniciar Modo Depuracion");
-        btnConfig.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(255, 255, 255)));
-        btnConfig.setFocusable(false);
-        btnConfig.addActionListener(new java.awt.event.ActionListener() {
+        btnDepuracion.setBackground(new java.awt.Color(83, 63, 89));
+        btnDepuracion.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
+        btnDepuracion.setForeground(new java.awt.Color(255, 255, 255));
+        btnDepuracion.setText("Iniciar Modo Depuracion");
+        btnDepuracion.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(255, 255, 255)));
+        btnDepuracion.setFocusable(false);
+        btnDepuracion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnConfigActionPerformed(evt);
+                btnDepuracionActionPerformed(evt);
             }
         });
 
@@ -575,10 +589,10 @@ public class MenuPrincipal extends javax.swing.JFrame {
                 .addGap(294, 294, 294)
                 .addComponent(btnBusquedaPatrones, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(btnConfig, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnDepuracion, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btnGenerarReportes, javax.swing.GroupLayout.PREFERRED_SIZE, 299, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(294, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         barraLateralLayout.setVerticalGroup(
             barraLateralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -586,10 +600,13 @@ public class MenuPrincipal extends javax.swing.JFrame {
                 .addContainerGap(8, Short.MAX_VALUE)
                 .addGroup(barraLateralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnBusquedaPatrones, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnConfig, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnDepuracion, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnGenerarReportes, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
+
+        labelLayout.setFont(new java.awt.Font("Liberation Sans", 1, 20)); // NOI18N
+        labelLayout.setText("Fila: 0 | Columna: 0");
 
         javax.swing.GroupLayout panelPrincipalLayout = new javax.swing.GroupLayout(panelPrincipal);
         panelPrincipal.setLayout(panelPrincipalLayout);
@@ -598,13 +615,15 @@ public class MenuPrincipal extends javax.swing.JFrame {
             .addComponent(panelBarraPrincipal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(panelPrincipalLayout.createSequentialGroup()
                 .addGap(12, 12, 12)
-                .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(scrollAreaEdicion, javax.swing.GroupLayout.DEFAULT_SIZE, 857, Short.MAX_VALUE)
-                    .addComponent(labelOperaciones1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(scrollAreaEdicion)
+                        .addComponent(labelOperaciones1, javax.swing.GroupLayout.DEFAULT_SIZE, 824, Short.MAX_VALUE))
+                    .addComponent(labelLayout, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
             .addComponent(barraLateral, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -613,16 +632,19 @@ public class MenuPrincipal extends javax.swing.JFrame {
             .addGroup(panelPrincipalLayout.createSequentialGroup()
                 .addComponent(panelBarraPrincipal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(panelPrincipalLayout.createSequentialGroup()
                         .addComponent(labelOperaciones1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(scrollAreaEdicion, javax.swing.GroupLayout.PREFERRED_SIZE, 670, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(scrollAreaEdicion, javax.swing.GroupLayout.PREFERRED_SIZE, 650, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(labelLayout, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(12, 12, 12))
                     .addGroup(panelPrincipalLayout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 556, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addComponent(barraLateral, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -824,10 +846,10 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
     }//GEN-LAST:event_btnGenerarReportesActionPerformed
 
-    private void btnConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfigActionPerformed
+    private void btnDepuracionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDepuracionActionPerformed
         //Boton que despliega las opciones para editar el config
         //iniciarModoDepuracion();
-    }//GEN-LAST:event_btnConfigActionPerformed
+    }//GEN-LAST:event_btnDepuracionActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         //Codiciona que se debe de confirmar si se quiere cerrar la aplicacion
@@ -836,12 +858,17 @@ public class MenuPrincipal extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_formWindowClosing
 
+    private void lblHomeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblHomeMouseClicked
+        //Boton que permite regresar al inicio/Menu Principal
+        regresarInicio();
+    }//GEN-LAST:event_lblHomeMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel barraLateral;
     private javax.swing.JButton btnAnalisis;
     private javax.swing.JButton btnBusquedaPatrones;
-    private javax.swing.JButton btnConfig;
+    private javax.swing.JButton btnDepuracion;
     private javax.swing.JButton btnGenerarReportes;
     private javax.swing.JButton btnGuardarArchivo;
     private javax.swing.JButton btnQuitarArchivo;
@@ -850,6 +877,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JLabel labelDatos;
+    private javax.swing.JLabel labelLayout;
     private javax.swing.JLabel labelOperaciones1;
     private javax.swing.JLabel lblAdmin;
     private javax.swing.JLabel lblAnalisis;

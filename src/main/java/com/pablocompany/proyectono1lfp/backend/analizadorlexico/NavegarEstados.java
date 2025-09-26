@@ -79,7 +79,7 @@ public class NavegarEstados {
 
                 try {
 
-                    if (nodoAnalizado.getToken() != Token.ERROR) {
+                    if (nodoAnalizado.getToken() != TokenEnum.ERROR) {
                         registroCadena.append(nodoAnalizado.getCaracter());
 
                         viajarEstado(nodoAnalizado, this.lexemaAnalisis.getEstadoAnalisis(), this.lexemaAnalisis, j, String.valueOf(registroCadena));
@@ -96,7 +96,7 @@ public class NavegarEstados {
                         for (int i = indiceError; i >= 0; i--) {
 
                             Nodo nodoError = this.lexemaAnalisis.getValorNodo(i);
-                            nodoError.setTipo(Token.ERROR);
+                            nodoError.setTipo(TokenEnum.ERROR);
                         }
 
                         this.lexemaAnalisis.setLexemaError(ex.getMessage());
@@ -127,7 +127,7 @@ public class NavegarEstados {
                 for (int i = indiceError; i >= 0; i--) {
 
                     Nodo nodoError = this.lexemaAnalisis.getValorNodo(i);
-                    nodoError.setTipo(Token.ERROR);
+                    nodoError.setTipo(TokenEnum.ERROR);
                 }
 
                 this.logErrores.setText(this.logErrores.getText() + ex.getMessage() + "\n");
@@ -138,14 +138,14 @@ public class NavegarEstados {
 
         }
 
-        if (this.lexemaAnalisis.getValorNodo(0).getToken() == Token.ERROR) {
-            this.lexemaAnalisis.setEstadoAnalisis(Token.ERROR);
+        if (this.lexemaAnalisis.getValorNodo(0).getToken() == TokenEnum.ERROR) {
+            this.lexemaAnalisis.setEstadoAnalisis(TokenEnum.ERROR);
         }
 
     }
 
     //Metodo que sirve para seleccionar estado al que va estar viajando el analizador
-    public void viajarEstado(Nodo nodoActual, Token tokenDeclarado, Lexema lexemaInicial, int iteracion, String cadenaEvaluada) throws ErrorGramaticoException, ErrorPuntualException {
+    public void viajarEstado(Nodo nodoActual, TokenEnum tokenDeclarado, Lexema lexemaInicial, int iteracion, String cadenaEvaluada) throws ErrorGramaticoException, ErrorPuntualException {
 
         switch (tokenDeclarado) {
 
@@ -191,7 +191,7 @@ public class NavegarEstados {
 
         char nodoCaracterInicio = nodoAnalisis.getCaracter();
 
-        if (lexemaParametro.getEstadoAnalisis() == Token.CADENA) {
+        if (lexemaParametro.getEstadoAnalisis() == TokenEnum.CADENA) {
             return;
         }
 
@@ -200,9 +200,9 @@ public class NavegarEstados {
             int limite = lexemaParametro.getLongitudNodo();
 
             if (limite < 2) {
-                nodoAnalisis.setTipo(Token.ERROR);
+                nodoAnalisis.setTipo(TokenEnum.ERROR);
                 nodoAnalisis.setComodin(true);
-                throw new ErrorPuntualException(lexemaParametro.getLexema() + " " + lexemaParametro.getLexema() + " TOKEN " + Token.CADENA.getTipo() + "= \"");
+                throw new ErrorPuntualException(lexemaParametro.getLexema() + " " + lexemaParametro.getLexema() + " TOKEN " + TokenEnum.CADENA.getTipo() + "= \"");
             }
 
             Nodo nodoTemporal = lexemaParametro.getValorNodo(lexemaParametro.getLongitudNodo() - 1);
@@ -210,12 +210,12 @@ public class NavegarEstados {
             char nodoCaracterFin = nodoTemporal.getCaracter();
 
             if (!String.valueOf(nodoCaracterFin).equals("\"")) {
-                nodoTemporal.setTipo(Token.ERROR);
+                nodoTemporal.setTipo(TokenEnum.ERROR);
                 nodoTemporal.setComodin(true);
                 throw new ErrorPuntualException(lexemaParametro.getLexema() + " No tiene comillas de cierre. NO TOKEN");
             }
 
-            lexemaParametro.setEstadoAnalisis(Token.CADENA);
+            lexemaParametro.setEstadoAnalisis(TokenEnum.CADENA);
             return;
 
         }
@@ -226,38 +226,38 @@ public class NavegarEstados {
 
         //ultima condicion necesaria para la deteccion de cadenas de texto
         if (!String.valueOf(nodoCaracterInicio).equals("\"") && String.valueOf(nodoCaracterTemporalFin).equals("\"")) {
-            nodoTemporal1.setTipo(Token.ERROR);
+            nodoTemporal1.setTipo(TokenEnum.ERROR);
             nodoTemporal1.setComodin(true);
             throw new ErrorPuntualException(lexemaParametro.getLexema() + " No tiene comillas de apertura. NO TOKEN");
         }
 
         //Declara el estado de analisis como identificador
         if (esLetra(nodoCaracterInicio)) {
-            lexemaParametro.setEstadoAnalisis(Token.IDENTIFICADOR);
+            lexemaParametro.setEstadoAnalisis(TokenEnum.IDENTIFICADOR);
             return;
         }
 
         //Declara el estado como numerico (ESTE TIENE LA CAPACIDAD DE COMUNICARSE CON DECIMAL)
         if (esDigito(nodoCaracterInicio)) {
-            lexemaParametro.setEstadoAnalisis(Token.NUMERO);
+            lexemaParametro.setEstadoAnalisis(TokenEnum.NUMERO);
             return;
         }
 
         //Define el estado como operador
         if (this.constantesConfig.esOperadores(nodoCaracterInicio)) {
-            lexemaParametro.setEstadoAnalisis(Token.OPERADOR);
+            lexemaParametro.setEstadoAnalisis(TokenEnum.OPERADOR);
             return;
         }
 
         //Define el estado como agrupacion
         if (this.constantesConfig.esAgrupacion(nodoCaracterInicio)) {
-            lexemaParametro.setEstadoAnalisis(Token.AGRUPACION);
+            lexemaParametro.setEstadoAnalisis(TokenEnum.AGRUPACION);
             return;
         }
         
         //Define el estado como agrupacion
         if (this.constantesConfig.esPuntuacion(nodoCaracterInicio)) {
-            lexemaParametro.setEstadoAnalisis(Token.PUNTUACION);
+            lexemaParametro.setEstadoAnalisis(TokenEnum.PUNTUACION);
         }
 
     }
@@ -273,7 +273,7 @@ public class NavegarEstados {
             throw new ErrorGramaticoException(" Caracter de Puntuacion no registrado en " + palabraEvaluada);
         }
 
-        nodoActual.setTipo(Token.PUNTUACION);
+        nodoActual.setTipo(TokenEnum.PUNTUACION);
 
     }
     
@@ -287,7 +287,7 @@ public class NavegarEstados {
             throw new ErrorGramaticoException(" Signo de agrupacion no registrado en " + palabraEvaluada);
         }
 
-        nodoActual.setTipo(Token.AGRUPACION);
+        nodoActual.setTipo(TokenEnum.AGRUPACION);
 
     }
     //Metodo que permite comparar si son operadores en conjunto
@@ -300,7 +300,7 @@ public class NavegarEstados {
             throw new ErrorGramaticoException(" Operador no registrado en " + palabraEvaluada);
         }
 
-        nodoActual.setTipo(Token.OPERADOR);
+        nodoActual.setTipo(TokenEnum.OPERADOR);
 
     }
 
@@ -320,7 +320,7 @@ public class NavegarEstados {
             throw new ErrorGramaticoException(" No es letra ni numero en " + palabraEvaluada);
         }
 
-        nodoActual.setTipo(Token.IDENTIFICADOR);
+        nodoActual.setTipo(TokenEnum.IDENTIFICADOR);
 
     }
 
@@ -332,14 +332,14 @@ public class NavegarEstados {
 
         //Se comunica con el estado decimal para poder evaluar que sea decimal
         if (caracterNodo == '.') {
-            lexemaUtilizado.setEstadoAnalisis(Token.DECIMAL);
+            lexemaUtilizado.setEstadoAnalisis(TokenEnum.DECIMAL);
 
             //DECLARA EL VALOR COMO DECIMAL HACIA ATRAS SIEMRE Y CUANDO NO SEA ERROR
             for (int i = indice; i >= 0; i--) {
                 Nodo nodoComparacion = lexemaUtilizado.getValorNodo(i);
 
-                if (nodoComparacion.getToken() != Token.ERROR) {
-                    nodoComparacion.setTipo(Token.DECIMAL);
+                if (nodoComparacion.getToken() != TokenEnum.ERROR) {
+                    nodoComparacion.setTipo(TokenEnum.DECIMAL);
                 }
 
             }
@@ -363,7 +363,7 @@ public class NavegarEstados {
             throw new ErrorGramaticoException(" Caracter no admitido " + palabraEvaluada);
         }
 
-        nodoActual.setTipo(Token.NUMERO);
+        nodoActual.setTipo(TokenEnum.NUMERO);
 
     }
 
@@ -377,7 +377,7 @@ public class NavegarEstados {
         for (int i = 0; i < lexemaUtilizado.getLongitudNodo(); i++) {
             Nodo nodoComparacion = lexemaUtilizado.getValorNodo(i);
 
-            if (nodoComparacion.getToken() != Token.ERROR && nodoComparacion.getCaracter() == '.') {
+            if (nodoComparacion.getToken() != TokenEnum.ERROR && nodoComparacion.getCaracter() == '.') {
                 contadorPuntos++;
             }
 
@@ -405,7 +405,7 @@ public class NavegarEstados {
             throw new ErrorGramaticoException(" Sin digitos despues del punto en " + palabraEvaluada);
         }
 
-        nodoActual.setTipo(Token.DECIMAL);
+        nodoActual.setTipo(TokenEnum.DECIMAL);
     }
 
     //Metodo que permite analizar el estado de cadenas de texto
@@ -421,12 +421,12 @@ public class NavegarEstados {
             throw new ErrorGramaticoException(" Caracter no admitido en " + palabraEvaluada);
         }
 
-        if (indice > 0 && lexemaUtilizado.getValorNodo(indice - 1).getToken() == Token.ERROR) {
-            nodoActual.setTipo(Token.ERROR);
+        if (indice > 0 && lexemaUtilizado.getValorNodo(indice - 1).getToken() == TokenEnum.ERROR) {
+            nodoActual.setTipo(TokenEnum.ERROR);
             return;
         }
 
-        nodoActual.setTipo(Token.CADENA);
+        nodoActual.setTipo(TokenEnum.CADENA);
     }
 
     //===========================FIN DEL APARTADO DE METODOS QUE SIRVEN PARA IR DECLARANDO ESTADOS==============================

@@ -8,7 +8,7 @@ package com.pablocompany.proyectono1lfp.backend.analizadorlexico;
  *
  * @author pablo
  */
-public enum Token {
+public enum TokenEnum {
     
     INDEFINIDO("INDEFINIDO"),
     IDENTIFICADOR("IDENTIFICADOR"),
@@ -25,7 +25,7 @@ public enum Token {
 
     private String tipo;
 
-    private Token(String valor) {
+    private TokenEnum(String valor) {
         this.tipo = valor;
     }
 

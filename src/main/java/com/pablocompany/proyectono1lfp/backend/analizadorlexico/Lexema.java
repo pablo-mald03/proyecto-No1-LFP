@@ -24,7 +24,7 @@ public class Lexema {
     private int lineaCoordenada;
 
     //AYUDA A DECLARAR EL ESTADO INICIAL AL QUE SERA SOMETIDO EN BASE A LA DETECCION DE PATRON
-    private Token estadoAnalisis;
+    private TokenEnum estadoAnalisis;
     
     private String lexemaError; 
 
@@ -37,7 +37,7 @@ public class Lexema {
 
         this.lexemaGenerado = lexemaGenerado;
         this.lineaCoordenada = lineaCoordenada;
-        this.estadoAnalisis = Token.INDEFINIDO;
+        this.estadoAnalisis = TokenEnum.INDEFINIDO;
         this.yaDeclarado = false;
         this.lexemaError = "";
     }
@@ -64,12 +64,12 @@ public class Lexema {
     
     
     //Metodo que sirve para retornar el estado inicial del lexema
-    public Token getEstadoAnalisis() {
+    public TokenEnum getEstadoAnalisis() {
         return this.estadoAnalisis;
     }
 
     //Metodo que sirve para hacer el set total en dado caso de reconocer el token rapido
-    public void setEstadoAnalisis(Token tipoToken) {
+    public void setEstadoAnalisis(TokenEnum tipoToken) {
         this.estadoAnalisis = tipoToken;
     }
 
@@ -106,7 +106,7 @@ public class Lexema {
         for (int i = 0; i < palabra.length(); i++) {
 
             char caracter = palabra.charAt(i);
-            this.listaNodos.add(new Nodo(caracter, fila, columnaNodo, Token.INDEFINIDO));
+            this.listaNodos.add(new Nodo(caracter, fila, columnaNodo, TokenEnum.INDEFINIDO));
             columnaNodo++;
         }
         return columnaNodo;
@@ -114,7 +114,7 @@ public class Lexema {
     }
 
     //Metodo que ayuda a hacer el set para declarar rapidamente a un lexema como tipo (SOLO UTIL CUANDO ES ALGO QUE HACE MATCH LITERAL)
-    public void generalizarNodo(Token tipoToken) {
+    public void generalizarNodo(TokenEnum tipoToken) {
 
         for (Nodo nodito : this.listaNodos) {
             nodito.setTipo(tipoToken);

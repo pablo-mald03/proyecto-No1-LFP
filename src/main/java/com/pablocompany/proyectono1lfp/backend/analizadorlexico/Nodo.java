@@ -10,21 +10,23 @@ package com.pablocompany.proyectono1lfp.backend.analizadorlexico;
  */
 //Clase que permite darle un sentido a cada cadena de caracter
 public class Nodo {
+
+    //Representa el valor del caracter del nodo
+    private char caracter;
     
-     private char caracter;
     private int linea;
     private int columna;
-    private Token tipo;
+    private TokenEnum tipo;
     //Permite ubicar cual fue el nodo que fallo
     //true es el causante del fallo
     private boolean comodinError;
 
-    public Nodo(char caracter, int fila, int columna, Token tipo) {
+    public Nodo(char caracter, int fila, int columna, TokenEnum tipo) {
         this.caracter = caracter;
         this.linea = fila;
         this.columna = columna;
         this.tipo = tipo;
-        this.comodinError = false; 
+        this.comodinError = false;
     }
 
     //Ayudan a ubicar rapidamente cual es el token comodin para empezar a ciclar para atras
@@ -36,7 +38,6 @@ public class Nodo {
     public void setComodin(boolean comodin) {
         this.comodinError = comodin;
     }
-    
 
     //--------------------------APARTADO DE METODOS QUE SIRVEN PARA PODER SABER EL VALOR DE TOKEN O DE ESTADO---------------------
     public char getCaracter() {
@@ -51,7 +52,7 @@ public class Nodo {
         return columna;
     }
 
-    public Token getToken() {
+    public TokenEnum getToken() {
         return tipo;
     }
     //--------------------------FIN DEL APARTADO DE METODOS QUE SIRVEN PARA PODER SABER EL VALOR DE TOKEN O DE ESTADO---------------------
@@ -69,10 +70,9 @@ public class Nodo {
         this.columna = columna;
     }
 
-    public void setTipo(Token tipo) {
+    public void setTipo(TokenEnum tipo) {
         this.tipo = tipo;
     }
     //--------------------------FIN DEL APARTADO DE METODOS QUE SIRVEN PARA PODER MODIFICAR EL VALOR DE TOKEN O DE ESTADO---------------------
 
-    
 }

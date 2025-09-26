@@ -190,28 +190,28 @@ public class AnalizadorLexico {
 
         //Detecta si es palabra reservada directamente
         if (this.constantesConfig.esPalabrasReservadas(lexemaActual.getLexema())) {
-            lexemaActual.generalizarNodo(Token.PALABRA_RESERVADA);
+            lexemaActual.generalizarNodo(TokenEnum.PALABRA_RESERVADA);
             lexemaActual.setYaDeclarado(true);
             return true;
         }
 
         //Detecta si es operador directamente
         if (lexemaActual.getLongitudNodo() == 1 && this.constantesConfig.esOperadores(lexemaActual.getLexema().charAt(0))) {
-            lexemaActual.generalizarNodo(Token.OPERADOR);
+            lexemaActual.generalizarNodo(TokenEnum.OPERADOR);
             lexemaActual.setYaDeclarado(true);
             return true;
         }
 
         //Detecta si es signo de agrupacion directamente
         if (lexemaActual.getLongitudNodo() == 1 && this.constantesConfig.esAgrupacion(lexemaActual.getLexema().charAt(0))) {
-            lexemaActual.generalizarNodo(Token.AGRUPACION);
+            lexemaActual.generalizarNodo(TokenEnum.AGRUPACION);
             lexemaActual.setYaDeclarado(true);
             return true;
         }
 
         //Detecta si es signo de puntuacion directamente
         if (lexemaActual.getLongitudNodo() == 1 && this.constantesConfig.esPuntuacion(lexemaActual.getLexema().charAt(0))) {
-            lexemaActual.generalizarNodo(Token.PUNTUACION);
+            lexemaActual.generalizarNodo(TokenEnum.PUNTUACION);
             lexemaActual.setYaDeclarado(true);
             return true;
         }
@@ -225,7 +225,7 @@ public class AnalizadorLexico {
 
                 for (Lexema posicion : lineaPosicionada.obtenerListadoLexemas()) {
 
-                    posicion.generalizarNodo(Token.COMENTARIO_LINEA);
+                    posicion.generalizarNodo(TokenEnum.COMENTARIO_LINEA);
                     posicion.setYaDeclarado(true);
                 }
 
@@ -233,7 +233,7 @@ public class AnalizadorLexico {
             }
 
             if (lexemaActual.getValorNodo(0).getCaracter() == '/' && lexemaActual.getValorNodo(1).getCaracter() != '/' && lexemaActual.getValorNodo(1).getCaracter() != '*') {
-                lexemaActual.generalizarNodo(Token.ERROR);
+                lexemaActual.generalizarNodo(TokenEnum.ERROR);
                 lexemaActual.setYaDeclarado(true);
                 lexemaActual.setLexemaError(lexemaActual.getLexema() + " Formato no apropiado de comentario. NO TOKEN");
                 return true;
@@ -249,7 +249,7 @@ public class AnalizadorLexico {
 
             if (this.constantesConfig.esBloqueComentarioInicial(cadenaLexema)) {
 
-                lexemaActual.generalizarNodo(Token.COMENTARIO_BLOQUE);
+                lexemaActual.generalizarNodo(TokenEnum.COMENTARIO_BLOQUE);
                 lexemaActual.setYaDeclarado(true);
 
                 boolean finHallado = false;
@@ -262,7 +262,7 @@ public class AnalizadorLexico {
 
                         int indice = posicion.getLongitudNodo() - 1;
 
-                        posicion.generalizarNodo(Token.COMENTARIO_BLOQUE);
+                        posicion.generalizarNodo(TokenEnum.COMENTARIO_BLOQUE);
                         posicion.setYaDeclarado(true);
 
                         if (posicion.getLongitudNodo() > 1) {
@@ -375,7 +375,7 @@ public class AnalizadorLexico {
     }
 
     // Método que mapea el token a su color
-    private Color obtenerColorPorToken(Token tipo) {
+    private Color obtenerColorPorToken(TokenEnum tipo) {
         switch (tipo) {
             case PALABRA_RESERVADA:
                 return Color.BLUE;
