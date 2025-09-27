@@ -26,6 +26,10 @@ public class Lexema {
     //AYUDA A DECLARAR EL ESTADO INICIAL AL QUE SERA SOMETIDO EN BASE A LA DETECCION DE PATRON
     private TokenEnum estadoAnalisis;
     
+    //Atributo que permite especificar el caracter esperado
+    private String caracterEsperado;
+    
+    //Indica el lexema que causo el error
     private String lexemaError; 
 
     //ATRIBUTO QUE AYUDA A VALIDAR SI YA EL LEXAMA FUE COMPLETAMENTE PROCESADO
@@ -60,6 +64,16 @@ public class Lexema {
     //Metodo que retorna la cadena que provoco el error
     public String getCadenaError(){
         return this.lexemaError;
+    }
+
+    //Metodo que permite obtener el caracter o cadena esperada
+    public String getCaracterEsperado() {
+        return caracterEsperado;
+    }
+
+    //Metodo quepermite cambiar el caracter esperado
+    public void setCaracterEsperado(String caracterEsperado) {
+        this.caracterEsperado = caracterEsperado;
     }
     
     

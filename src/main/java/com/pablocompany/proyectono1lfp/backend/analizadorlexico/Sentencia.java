@@ -20,8 +20,7 @@ public class Sentencia {
         this.filaSentencia = fila;
         
     }
-    
-    
+     
     //Metodo que retorna la linea en la que se encuentra la sentencia
     public int getFilaSentencia(){
         return this.filaSentencia;

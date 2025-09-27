@@ -69,11 +69,13 @@ public class MenuPrincipal extends javax.swing.JFrame {
         this.txtAreaDirectorioArchivo.setEditable(false);
         this.textLogErrores.setEditable(false);
         this.textEdicionArchivo.setEditable(true);
+        this.txtLogTransiciones.setEditable(false);
         this.textEdicionArchivo.setCaretColor(Color.BLACK);
 
         this.gestionVentanas = 0;
         this.yaCargado = false;
         this.txtBusquedas.setVisible(false);
+        this.txtLogBusquedas.setVisible(false);
 
         editor = new EditorTexto(this.textEdicionArchivo, this.scrollAreaEdicion, this.labelLayout);
 
@@ -118,6 +120,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         this.btnDepuracion.setBackground(new Color(0x533F59));
         this.btnGenerarReportes.setBackground(new Color(0x533F59));
+        this.btnReporteConteo.setBackground(new Color(0x533F59));
         this.btnBusquedaPatrones.setBackground(new Color(0x4D6E4C));
 
     }
@@ -133,6 +136,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         this.btnBusquedaPatrones.setBackground(new Color(0x533F59));
         this.btnGenerarReportes.setBackground(new Color(0x533F59));
+        this.btnReporteConteo.setBackground(new Color(0x533F59));
         this.btnDepuracion.setBackground(new Color(0x4D6E4C));
         modoDepuracion();
 
@@ -149,6 +153,24 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         this.btnBusquedaPatrones.setBackground(new Color(0x533F59));
         this.btnDepuracion.setBackground(new Color(0x533F59));
+        this.btnReporteConteo.setBackground(new Color(0x533F59));
+        this.btnGenerarReportes.setBackground(new Color(0x4D6E4C));
+        operarReportes();
+
+    }
+    
+    //Metodo que genera la interaccion entre generar reportes
+    public void generarReportesConteo() {
+
+        ImageIcon iconoMedio = new ImageIcon(getClass().getResource("/com/pablocompany/proyectono1/recursosapp/images/reporConteoIcon.png"));
+
+        IlustrarLabels labelMedio = new IlustrarLabels(this.panelBarraPrincipal, 50, 50, "", this.lblEleccion);
+        labelMedio.cambiarLabel(iconoMedio);
+        this.lblEleccionesDadas.setText("Generar Reportes");
+
+        this.btnBusquedaPatrones.setBackground(new Color(0x533F59));
+        this.btnDepuracion.setBackground(new Color(0x533F59));
+        this.btnReporteConteo.setBackground(new Color(0x4D6E4C));
         this.btnGenerarReportes.setBackground(new Color(0x4D6E4C));
         operarReportes();
 
@@ -168,6 +190,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         this.btnBusquedaPatrones.setBackground(new Color(0x533F59));
         this.btnDepuracion.setBackground(new Color(0x533F59));
+        this.btnReporteConteo.setBackground(new Color(0x533F59));
         this.btnGenerarReportes.setBackground(new Color(0x533F59));
 
         reestablecerUI();
@@ -194,8 +217,8 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         this.textEdicionArchivo.setEditable(false);
         this.btnAnalisis.setVisible(false);
-        this.scrollErroresLog.setVisible(false);
         this.scrollBusquedas.setVisible(true);
+        this.scrollTransiciones.setVisible(false);
         this.txtBusquedas.setText("");
         this.txtLogBusquedas.setText("");
         this.lblMostrarError.setText("Resultados de busqueda:");
@@ -210,7 +233,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
     }
 
-    //Metodo que se utiliza para manejar todos los componentes y funciones previas a la configuracion de instrucciones
+    //Metodo que se utiliza para manejar todos los componentes y entrar en el modo depuracion del sistema
     public void modoDepuracion() {
         //Se despliega la ventana emergente para editar la configuracion
         /* EditarConfiguracion dialog = new EditarConfiguracion(this, true, leerEntradas, textEdicionArchivo, textLogErrores);
@@ -261,9 +284,10 @@ public class MenuPrincipal extends javax.swing.JFrame {
         this.txtLogBusquedas.setText("");
         this.scrollErroresLog.setVisible(true);
         this.scrollBusquedas.setVisible(false);
+        this.scrollTransiciones.setVisible(true);
         this.txtBusquedas.setText("");
         this.lblAnalisis.setText("Analizar Manualmente:");
-        this.lblMostrarError.setText("Errores Encontrados:");
+        this.lblMostrarError.setText("Transiciones del Automata:");
         this.txtBusquedas.setVisible(false);
         this.btnSubirArchivo.setEnabled(true);
         this.btnGuardarArchivo.setText("Guardar Texto");
@@ -303,8 +327,6 @@ public class MenuPrincipal extends javax.swing.JFrame {
         txtAreaDirectorioArchivo = new javax.swing.JTextArea();
         btnQuitarArchivo = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
-        scrollErroresLog = new javax.swing.JScrollPane();
-        textLogErrores = new javax.swing.JTextPane();
         lblMostrarError = new javax.swing.JLabel();
         btnGuardarArchivo = new javax.swing.JButton();
         btnAnalisis = new javax.swing.JButton();
@@ -312,11 +334,17 @@ public class MenuPrincipal extends javax.swing.JFrame {
         lblAnalisis = new javax.swing.JLabel();
         scrollBusquedas = new javax.swing.JScrollPane();
         txtLogBusquedas = new javax.swing.JTextPane();
+        scrollTransiciones = new javax.swing.JScrollPane();
+        txtLogTransiciones = new javax.swing.JTextPane();
         barraLateral = new javax.swing.JPanel();
         btnBusquedaPatrones = new javax.swing.JButton();
         btnGenerarReportes = new javax.swing.JButton();
         btnDepuracion = new javax.swing.JButton();
+        btnReporteConteo = new javax.swing.JButton();
         labelLayout = new javax.swing.JLabel();
+        lblErroresEncontrados = new javax.swing.JLabel();
+        scrollErroresLog = new javax.swing.JScrollPane();
+        textLogErrores = new javax.swing.JTextPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Analizador Lexico");
@@ -339,7 +367,6 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         lblHome.setBackground(new java.awt.Color(71, 7, 110));
         lblHome.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/pablocompany/proyectono1/recursosapp/images/home2.png"))); // NOI18N
-        lblHome.setPreferredSize(new java.awt.Dimension(60, 60));
         lblHome.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 lblHomeMouseClicked(evt);
@@ -360,7 +387,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblEleccionesDadas, javax.swing.GroupLayout.PREFERRED_SIZE, 382, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 408, Short.MAX_VALUE)
-                .addComponent(lblHome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblHome)
                 .addGap(17, 17, 17))
         );
         panelBarraPrincipalLayout.setVerticalGroup(
@@ -379,11 +406,11 @@ public class MenuPrincipal extends javax.swing.JFrame {
                                 .addComponent(lblAdmin, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(lblEleccion, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGap(11, 11, 11)))
-                    .addComponent(lblHome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblHome))
                 .addContainerGap(10, Short.MAX_VALUE))
         );
 
-        labelOperaciones1.setFont(new java.awt.Font("Liberation Sans", 1, 30)); // NOI18N
+        labelOperaciones1.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
         labelOperaciones1.setForeground(new java.awt.Color(83, 31, 11));
         labelOperaciones1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         labelOperaciones1.setText("Archivo de entrada:");
@@ -401,7 +428,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         jPanel1.setBorder(javax.swing.BorderFactory.createMatteBorder(5, 5, 5, 5, new java.awt.Color(50, 56, 68)));
         jPanel1.setOpaque(false);
 
-        labelDatos.setFont(new java.awt.Font("Liberation Sans", 1, 32)); // NOI18N
+        labelDatos.setFont(new java.awt.Font("Liberation Sans", 1, 28)); // NOI18N
         labelDatos.setForeground(new java.awt.Color(83, 31, 11));
         labelDatos.setText("Requisitos de carga de archivos:");
 
@@ -444,8 +471,8 @@ public class MenuPrincipal extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 341, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(labelDatos, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING)))
+                        .addComponent(labelDatos, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnSubirArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -456,15 +483,15 @@ public class MenuPrincipal extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(labelDatos)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lblTitulo)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(btnQuitarArchivo)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(btnQuitarArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(btnSubirArchivo)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -473,25 +500,12 @@ public class MenuPrincipal extends javax.swing.JFrame {
         jPanel2.setOpaque(false);
         jPanel2.setLayout(null);
 
-        textLogErrores.setBackground(new java.awt.Color(228, 228, 228));
-        textLogErrores.setFont(new java.awt.Font("Liberation Serif", 1, 20)); // NOI18N
-        textLogErrores.setForeground(new java.awt.Color(140, 1, 25));
-        textLogErrores.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                textLogErroresKeyReleased(evt);
-            }
-        });
-        scrollErroresLog.setViewportView(textLogErrores);
-
-        jPanel2.add(scrollErroresLog);
-        scrollErroresLog.setBounds(20, 150, 680, 410);
-
-        lblMostrarError.setFont(new java.awt.Font("Liberation Sans", 1, 32)); // NOI18N
+        lblMostrarError.setFont(new java.awt.Font("Liberation Sans", 1, 26)); // NOI18N
         lblMostrarError.setForeground(new java.awt.Color(83, 31, 11));
         lblMostrarError.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblMostrarError.setText("Errores Encontrados:");
+        lblMostrarError.setText("Transiciones del Automata:");
         jPanel2.add(lblMostrarError);
-        lblMostrarError.setBounds(10, 110, 700, 37);
+        lblMostrarError.setBounds(10, 100, 700, 40);
 
         btnGuardarArchivo.setBackground(new java.awt.Color(19, 115, 146));
         btnGuardarArchivo.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
@@ -502,7 +516,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
             }
         });
         jPanel2.add(btnGuardarArchivo);
-        btnGuardarArchivo.setBounds(480, 50, 203, 50);
+        btnGuardarArchivo.setBounds(490, 50, 203, 40);
 
         btnAnalisis.setBackground(new java.awt.Color(46, 136, 80));
         btnAnalisis.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
@@ -513,20 +527,20 @@ public class MenuPrincipal extends javax.swing.JFrame {
             }
         });
         jPanel2.add(btnAnalisis);
-        btnAnalisis.setBounds(40, 50, 203, 50);
+        btnAnalisis.setBounds(40, 50, 203, 40);
 
         txtBusquedas.setBackground(new java.awt.Color(228, 228, 228));
         txtBusquedas.setFont(new java.awt.Font("Liberation Serif", 0, 24)); // NOI18N
         txtBusquedas.setForeground(new java.awt.Color(63, 58, 58));
         jPanel2.add(txtBusquedas);
-        txtBusquedas.setBounds(40, 50, 410, 50);
+        txtBusquedas.setBounds(40, 50, 410, 40);
 
-        lblAnalisis.setFont(new java.awt.Font("Liberation Sans", 1, 30)); // NOI18N
+        lblAnalisis.setFont(new java.awt.Font("Liberation Sans", 1, 26)); // NOI18N
         lblAnalisis.setForeground(new java.awt.Color(83, 31, 11));
         lblAnalisis.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblAnalisis.setText("Analizar Manualmente:");
         jPanel2.add(lblAnalisis);
-        lblAnalisis.setBounds(10, 10, 700, 36);
+        lblAnalisis.setBounds(20, 10, 690, 30);
 
         txtLogBusquedas.setBackground(new java.awt.Color(228, 228, 228));
         txtLogBusquedas.setFont(new java.awt.Font("Liberation Serif", 1, 20)); // NOI18N
@@ -539,7 +553,20 @@ public class MenuPrincipal extends javax.swing.JFrame {
         scrollBusquedas.setViewportView(txtLogBusquedas);
 
         jPanel2.add(scrollBusquedas);
-        scrollBusquedas.setBounds(20, 150, 680, 410);
+        scrollBusquedas.setBounds(10, 140, 690, 430);
+
+        txtLogTransiciones.setBackground(new java.awt.Color(228, 228, 228));
+        txtLogTransiciones.setFont(new java.awt.Font("Liberation Serif", 1, 20)); // NOI18N
+        txtLogTransiciones.setForeground(new java.awt.Color(140, 1, 25));
+        txtLogTransiciones.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtLogTransicionesKeyReleased(evt);
+            }
+        });
+        scrollTransiciones.setViewportView(txtLogTransiciones);
+
+        jPanel2.add(scrollTransiciones);
+        scrollTransiciones.setBounds(10, 140, 690, 430);
 
         barraLateral.setBackground(new java.awt.Color(45, 1, 61));
         barraLateral.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(0, 0, 0)));
@@ -560,7 +587,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         btnGenerarReportes.setBackground(new java.awt.Color(83, 63, 89));
         btnGenerarReportes.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
         btnGenerarReportes.setForeground(new java.awt.Color(255, 255, 255));
-        btnGenerarReportes.setText("Generar Reportes");
+        btnGenerarReportes.setText("Reportes Generales");
         btnGenerarReportes.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(255, 255, 255)));
         btnGenerarReportes.setFocusable(false);
         btnGenerarReportes.addActionListener(new java.awt.event.ActionListener() {
@@ -581,32 +608,62 @@ public class MenuPrincipal extends javax.swing.JFrame {
             }
         });
 
+        btnReporteConteo.setBackground(new java.awt.Color(83, 63, 89));
+        btnReporteConteo.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
+        btnReporteConteo.setForeground(new java.awt.Color(255, 255, 255));
+        btnReporteConteo.setText("Reporte Conteo Lexemas");
+        btnReporteConteo.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(255, 255, 255)));
+        btnReporteConteo.setFocusable(false);
+        btnReporteConteo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReporteConteoActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout barraLateralLayout = new javax.swing.GroupLayout(barraLateral);
         barraLateral.setLayout(barraLateralLayout);
         barraLateralLayout.setHorizontalGroup(
             barraLateralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(barraLateralLayout.createSequentialGroup()
-                .addGap(294, 294, 294)
+                .addGap(143, 143, 143)
                 .addComponent(btnBusquedaPatrones, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btnDepuracion, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(btnGenerarReportes, javax.swing.GroupLayout.PREFERRED_SIZE, 299, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnGenerarReportes, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnReporteConteo, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         barraLateralLayout.setVerticalGroup(
             barraLateralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(barraLateralLayout.createSequentialGroup()
-                .addContainerGap(8, Short.MAX_VALUE)
+                .addContainerGap(16, Short.MAX_VALUE)
                 .addGroup(barraLateralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnBusquedaPatrones, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnDepuracion, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnGenerarReportes, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnGenerarReportes, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnReporteConteo, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
         labelLayout.setFont(new java.awt.Font("Liberation Sans", 1, 20)); // NOI18N
         labelLayout.setText("Fila: 0 | Columna: 0");
+
+        lblErroresEncontrados.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
+        lblErroresEncontrados.setForeground(new java.awt.Color(83, 31, 11));
+        lblErroresEncontrados.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblErroresEncontrados.setText("Errores Encontrados");
+
+        textLogErrores.setBackground(new java.awt.Color(228, 228, 228));
+        textLogErrores.setFont(new java.awt.Font("Liberation Serif", 1, 20)); // NOI18N
+        textLogErrores.setForeground(new java.awt.Color(140, 1, 25));
+        textLogErrores.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                textLogErroresKeyReleased(evt);
+            }
+        });
+        scrollErroresLog.setViewportView(textLogErrores);
 
         javax.swing.GroupLayout panelPrincipalLayout = new javax.swing.GroupLayout(panelPrincipal);
         panelPrincipal.setLayout(panelPrincipalLayout);
@@ -614,12 +671,20 @@ public class MenuPrincipal extends javax.swing.JFrame {
             panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(panelBarraPrincipal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(panelPrincipalLayout.createSequentialGroup()
-                .addGap(12, 12, 12)
                 .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(scrollAreaEdicion)
-                        .addComponent(labelOperaciones1, javax.swing.GroupLayout.DEFAULT_SIZE, 824, Short.MAX_VALUE))
-                    .addComponent(labelLayout, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(panelPrincipalLayout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(scrollAreaEdicion)
+                                .addComponent(labelOperaciones1, javax.swing.GroupLayout.DEFAULT_SIZE, 824, Short.MAX_VALUE))
+                            .addComponent(labelLayout, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(panelPrincipalLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(lblErroresEncontrados, javax.swing.GroupLayout.PREFERRED_SIZE, 828, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(panelPrincipalLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(scrollErroresLog, javax.swing.GroupLayout.PREFERRED_SIZE, 828, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -632,19 +697,22 @@ public class MenuPrincipal extends javax.swing.JFrame {
             .addGroup(panelPrincipalLayout.createSequentialGroup()
                 .addComponent(panelBarraPrincipal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(panelPrincipalLayout.createSequentialGroup()
-                        .addComponent(labelOperaciones1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(labelOperaciones1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(scrollAreaEdicion, javax.swing.GroupLayout.PREFERRED_SIZE, 650, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(scrollAreaEdicion, javax.swing.GroupLayout.PREFERRED_SIZE, 436, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(labelLayout, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(12, 12, 12))
+                        .addComponent(labelLayout)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblErroresEncontrados, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(scrollErroresLog, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(panelPrincipalLayout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 584, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(barraLateral, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -729,6 +797,8 @@ public class MenuPrincipal extends javax.swing.JFrame {
                     this.txtAreaDirectorioArchivo.setText("");
                     this.manipuladorDirectorios.reiniciarPath();
                     this.textEdicionArchivo.setText("");
+                    this.textLogErrores.setText("");
+                    this.txtLogTransiciones.setText("");
                     this.yaCargado = false;
                     this.btnGuardarArchivo.setEnabled(true);
 
@@ -863,6 +933,14 @@ public class MenuPrincipal extends javax.swing.JFrame {
         regresarInicio();
     }//GEN-LAST:event_lblHomeMouseClicked
 
+    private void btnReporteConteoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReporteConteoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnReporteConteoActionPerformed
+
+    private void txtLogTransicionesKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtLogTransicionesKeyReleased
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtLogTransicionesKeyReleased
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel barraLateral;
@@ -872,6 +950,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private javax.swing.JButton btnGenerarReportes;
     private javax.swing.JButton btnGuardarArchivo;
     private javax.swing.JButton btnQuitarArchivo;
+    private javax.swing.JButton btnReporteConteo;
     private javax.swing.JButton btnSubirArchivo;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -883,6 +962,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel lblAnalisis;
     private javax.swing.JLabel lblEleccion;
     private javax.swing.JLabel lblEleccionesDadas;
+    private javax.swing.JLabel lblErroresEncontrados;
     private javax.swing.JLabel lblHome;
     private javax.swing.JLabel lblMostrarError;
     private javax.swing.JLabel lblPerfil;
@@ -892,10 +972,12 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private javax.swing.JScrollPane scrollAreaEdicion;
     private javax.swing.JScrollPane scrollBusquedas;
     private javax.swing.JScrollPane scrollErroresLog;
+    private javax.swing.JScrollPane scrollTransiciones;
     private javax.swing.JTextPane textEdicionArchivo;
     private javax.swing.JTextPane textLogErrores;
     private javax.swing.JTextArea txtAreaDirectorioArchivo;
     private javax.swing.JTextField txtBusquedas;
     private javax.swing.JTextPane txtLogBusquedas;
+    private javax.swing.JTextPane txtLogTransiciones;
     // End of variables declaration//GEN-END:variables
 }
