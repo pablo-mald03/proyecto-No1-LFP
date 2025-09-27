@@ -119,8 +119,8 @@ public class MenuPrincipal extends javax.swing.JFrame {
         operarBusquedas();
 
         this.btnDepuracion.setBackground(new Color(0x533F59));
-        this.btnGenerarReportes.setBackground(new Color(0x533F59));
-        this.btnReporteConteo.setBackground(new Color(0x533F59));
+        this.btnReporteErrores.setBackground(new Color(0x533F59));
+        this.btnReporteTokens.setBackground(new Color(0x533F59));
         this.btnBusquedaPatrones.setBackground(new Color(0x4D6E4C));
 
     }
@@ -128,50 +128,51 @@ public class MenuPrincipal extends javax.swing.JFrame {
     //Metodo que genera la interaccion entre modificar el archivo de configuracion
     public void iniciarModoDepuracion() {
 
-        ImageIcon iconoMedio = new ImageIcon(getClass().getResource("/com/pablocompany/proyectono1/recursosapp/images/subirArchivo.png"));
+        ImageIcon iconoMedio = new ImageIcon(getClass().getResource("/com/pablocompany/proyectono1/recursosapp/images/depurarIcon.png"));
 
         IlustrarLabels labelMedio = new IlustrarLabels(this.panelBarraPrincipal, 50, 50, "", this.lblEleccion);
         labelMedio.cambiarLabel(iconoMedio);
-        this.lblEleccionesDadas.setText("Editar Configuracion");
+        this.lblEleccionesDadas.setText("Modo Depuracion");
 
         this.btnBusquedaPatrones.setBackground(new Color(0x533F59));
-        this.btnGenerarReportes.setBackground(new Color(0x533F59));
-        this.btnReporteConteo.setBackground(new Color(0x533F59));
+        this.btnReporteErrores.setBackground(new Color(0x533F59));
+        this.btnReporteTokens.setBackground(new Color(0x533F59));
         this.btnDepuracion.setBackground(new Color(0x4D6E4C));
         modoDepuracion();
 
     }
 
     //Metodo que genera la interaccion entre generar reportes
-    public void generarReportes() {
+    public void generarReporteErrores() {
 
         ImageIcon iconoMedio = new ImageIcon(getClass().getResource("/com/pablocompany/proyectono1/recursosapp/images/reportes.png"));
 
         IlustrarLabels labelMedio = new IlustrarLabels(this.panelBarraPrincipal, 50, 50, "", this.lblEleccion);
         labelMedio.cambiarLabel(iconoMedio);
-        this.lblEleccionesDadas.setText("Generar Reportes");
+        this.lblEleccionesDadas.setText("Reporte de Errores");
 
         this.btnBusquedaPatrones.setBackground(new Color(0x533F59));
         this.btnDepuracion.setBackground(new Color(0x533F59));
-        this.btnReporteConteo.setBackground(new Color(0x533F59));
-        this.btnGenerarReportes.setBackground(new Color(0x4D6E4C));
+        this.btnReporteTokens.setBackground(new Color(0x533F59));
+        this.btnReporteErrores.setBackground(new Color(0x4D6E4C));
         operarReportes();
 
     }
     
     //Metodo que genera la interaccion entre generar reportes
-    public void generarReportesConteo() {
+    public void generarReporteTokens() {
 
         ImageIcon iconoMedio = new ImageIcon(getClass().getResource("/com/pablocompany/proyectono1/recursosapp/images/reporConteoIcon.png"));
 
         IlustrarLabels labelMedio = new IlustrarLabels(this.panelBarraPrincipal, 50, 50, "", this.lblEleccion);
         labelMedio.cambiarLabel(iconoMedio);
-        this.lblEleccionesDadas.setText("Generar Reportes");
+        this.lblEleccionesDadas.setText("Reporte Conteo Lexemas");
 
         this.btnBusquedaPatrones.setBackground(new Color(0x533F59));
         this.btnDepuracion.setBackground(new Color(0x533F59));
-        this.btnReporteConteo.setBackground(new Color(0x4D6E4C));
-        this.btnGenerarReportes.setBackground(new Color(0x4D6E4C));
+        this.btnReporteTokens.setBackground(new Color(0x4D6E4C));
+        this.btnReporteErrores.setBackground(new Color(0x533F59));
+        
         operarReportes();
 
     }
@@ -190,8 +191,8 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         this.btnBusquedaPatrones.setBackground(new Color(0x533F59));
         this.btnDepuracion.setBackground(new Color(0x533F59));
-        this.btnReporteConteo.setBackground(new Color(0x533F59));
-        this.btnGenerarReportes.setBackground(new Color(0x533F59));
+        this.btnReporteTokens.setBackground(new Color(0x533F59));
+        this.btnReporteErrores.setBackground(new Color(0x533F59));
 
         reestablecerUI();
 
@@ -232,6 +233,9 @@ public class MenuPrincipal extends javax.swing.JFrame {
         this.txtBusquedas.requestFocusInWindow();
 
     }
+    
+    //Metodo encargado de ejecutar el reporte de conteo de lexemas
+    
 
     //Metodo que se utiliza para manejar todos los componentes y entrar en el modo depuracion del sistema
     public void modoDepuracion() {
@@ -338,9 +342,9 @@ public class MenuPrincipal extends javax.swing.JFrame {
         txtLogTransiciones = new javax.swing.JTextPane();
         barraLateral = new javax.swing.JPanel();
         btnBusquedaPatrones = new javax.swing.JButton();
-        btnGenerarReportes = new javax.swing.JButton();
+        btnReporteErrores = new javax.swing.JButton();
         btnDepuracion = new javax.swing.JButton();
-        btnReporteConteo = new javax.swing.JButton();
+        btnReporteTokens = new javax.swing.JButton();
         labelLayout = new javax.swing.JLabel();
         lblErroresEncontrados = new javax.swing.JLabel();
         scrollErroresLog = new javax.swing.JScrollPane();
@@ -584,15 +588,15 @@ public class MenuPrincipal extends javax.swing.JFrame {
             }
         });
 
-        btnGenerarReportes.setBackground(new java.awt.Color(83, 63, 89));
-        btnGenerarReportes.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
-        btnGenerarReportes.setForeground(new java.awt.Color(255, 255, 255));
-        btnGenerarReportes.setText("Reportes Generales");
-        btnGenerarReportes.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(255, 255, 255)));
-        btnGenerarReportes.setFocusable(false);
-        btnGenerarReportes.addActionListener(new java.awt.event.ActionListener() {
+        btnReporteErrores.setBackground(new java.awt.Color(83, 63, 89));
+        btnReporteErrores.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
+        btnReporteErrores.setForeground(new java.awt.Color(255, 255, 255));
+        btnReporteErrores.setText("Reportes Errores");
+        btnReporteErrores.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(255, 255, 255)));
+        btnReporteErrores.setFocusable(false);
+        btnReporteErrores.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGenerarReportesActionPerformed(evt);
+                btnReporteErroresActionPerformed(evt);
             }
         });
 
@@ -608,15 +612,15 @@ public class MenuPrincipal extends javax.swing.JFrame {
             }
         });
 
-        btnReporteConteo.setBackground(new java.awt.Color(83, 63, 89));
-        btnReporteConteo.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
-        btnReporteConteo.setForeground(new java.awt.Color(255, 255, 255));
-        btnReporteConteo.setText("Reporte Conteo Lexemas");
-        btnReporteConteo.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(255, 255, 255)));
-        btnReporteConteo.setFocusable(false);
-        btnReporteConteo.addActionListener(new java.awt.event.ActionListener() {
+        btnReporteTokens.setBackground(new java.awt.Color(83, 63, 89));
+        btnReporteTokens.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
+        btnReporteTokens.setForeground(new java.awt.Color(255, 255, 255));
+        btnReporteTokens.setText("Reporte de Tokens");
+        btnReporteTokens.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(255, 255, 255)));
+        btnReporteTokens.setFocusable(false);
+        btnReporteTokens.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnReporteConteoActionPerformed(evt);
+                btnReporteTokensActionPerformed(evt);
             }
         });
 
@@ -630,9 +634,9 @@ public class MenuPrincipal extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(btnDepuracion, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(btnGenerarReportes, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnReporteErrores, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(btnReporteConteo, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnReporteTokens, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         barraLateralLayout.setVerticalGroup(
@@ -642,8 +646,8 @@ public class MenuPrincipal extends javax.swing.JFrame {
                 .addGroup(barraLateralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnBusquedaPatrones, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnDepuracion, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnGenerarReportes, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnReporteConteo, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnReporteErrores, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnReporteTokens, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -701,13 +705,13 @@ public class MenuPrincipal extends javax.swing.JFrame {
                     .addGroup(panelPrincipalLayout.createSequentialGroup()
                         .addComponent(labelOperaciones1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(scrollAreaEdicion, javax.swing.GroupLayout.PREFERRED_SIZE, 436, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(scrollAreaEdicion, javax.swing.GroupLayout.PREFERRED_SIZE, 414, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(labelLayout)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lblErroresEncontrados, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(scrollErroresLog, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(scrollErroresLog, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(panelPrincipalLayout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -910,15 +914,15 @@ public class MenuPrincipal extends javax.swing.JFrame {
         mostrarBusquedas();
     }//GEN-LAST:event_btnBusquedaPatronesActionPerformed
 
-    private void btnGenerarReportesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarReportesActionPerformed
+    private void btnReporteErroresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReporteErroresActionPerformed
         //Boton que permite generar los reportes
-        // generarReportes();
+        generarReporteErrores();
 
-    }//GEN-LAST:event_btnGenerarReportesActionPerformed
+    }//GEN-LAST:event_btnReporteErroresActionPerformed
 
     private void btnDepuracionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDepuracionActionPerformed
-        //Boton que despliega las opciones para editar el config
-        //iniciarModoDepuracion();
+        //Boton que despliega las opciones para iniciar la depurarion
+        iniciarModoDepuracion();
     }//GEN-LAST:event_btnDepuracionActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
@@ -933,9 +937,10 @@ public class MenuPrincipal extends javax.swing.JFrame {
         regresarInicio();
     }//GEN-LAST:event_lblHomeMouseClicked
 
-    private void btnReporteConteoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReporteConteoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnReporteConteoActionPerformed
+    private void btnReporteTokensActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReporteTokensActionPerformed
+        //Metodo que sirve para poder generar los reportes de tokens
+        generarReporteTokens();
+    }//GEN-LAST:event_btnReporteTokensActionPerformed
 
     private void txtLogTransicionesKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtLogTransicionesKeyReleased
         // TODO add your handling code here:
@@ -947,10 +952,10 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private javax.swing.JButton btnAnalisis;
     private javax.swing.JButton btnBusquedaPatrones;
     private javax.swing.JButton btnDepuracion;
-    private javax.swing.JButton btnGenerarReportes;
     private javax.swing.JButton btnGuardarArchivo;
     private javax.swing.JButton btnQuitarArchivo;
-    private javax.swing.JButton btnReporteConteo;
+    private javax.swing.JButton btnReporteErrores;
+    private javax.swing.JButton btnReporteTokens;
     private javax.swing.JButton btnSubirArchivo;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
