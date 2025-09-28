@@ -113,11 +113,43 @@ public class NavegarEstados {
                         }
 
                     } catch (AnalizadorLexicoException ex1) {
-                        System.out.println("No se encontro indice sdfsdfds" + ex1.getMessage());
+                        System.out.println("No se encontro indice " + ex1.getMessage());
                     }
 
                 } catch (ErrorPuntualException ex2) {
-                    System.out.println("Caracter no registrado en la gramatica " + ex2.getMessage());
+                    //Leexema no definido en la gramatica 
+
+                    try {
+
+                        int indiceError = this.lexemaAnalisis.getIndiceError();
+
+                        this.lexemaAnalisis.getValorNodo(indiceError).setComodin(false);
+
+                        this.lexemaAnalisis.setCadenaEsperada("Se esperaba un caracter de la gramatica");
+
+                        for (int i = indiceError; i >= 0; i--) {
+
+                            Nodo nodoError = this.lexemaAnalisis.getValorNodo(i);
+                            nodoError.setTipo(TokenEnum.ERROR);
+                        }
+
+                        this.lexemaAnalisis.setLexemaError(ex2.getMessage());
+
+                        registroCadena.setLength(0);
+
+                        if (indiceError + 1 < this.lexemaAnalisis.getLongitudNodo()) {
+                            declararEstadoInicial(this.lexemaAnalisis, this.lexemaAnalisis.getValorNodo(indiceError + 1));
+                        }
+
+                        if (!this.lexemaAnalisis.getCadenaError().isBlank()) {
+                            //Se registra el error en las transiciones
+                            anunciarError(this.lexemaAnalisis);
+                        }
+
+                    } catch (AnalizadorLexicoException ex1) {
+                        System.out.println("No se encontro indice " + ex1.getMessage());
+                    }
+
                 }
 
             }
@@ -186,7 +218,8 @@ public class NavegarEstados {
                 break;
 
             default:
-                throw new ErrorPuntualException(String.valueOf(nodoActual.getCaracter()));
+                nodoActual.setComodin(true);
+                throw new ErrorPuntualException("caracter no registrado en la Gramatica " + String.valueOf(nodoActual.getCaracter()));
 
         }
 
@@ -296,7 +329,7 @@ public class NavegarEstados {
             insertarEstadoTransicion("Reiniciando Automata...", Color.BLACK, this.logTransicionesAFD);
 
             insertarEstadoTransicion("\n", Color.BLACK, this.logTransicionesAFD);
-            
+
             lexemaError.setIndiceViajeAFD(0);
 
         } catch (BadLocationException ex) {
