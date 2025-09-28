@@ -37,13 +37,12 @@ public class LectorEntradas {
     private ConfigDatos constantesConfig;
 
     //private GenerarReportes generacionReportes;
-
     public LectorEntradas() {
-       this.constantesConfig = new ConfigDatos();
+        this.constantesConfig = new ConfigDatos();
 
         this.constantesConfig.cargarDesdeJson();
         this.lexerActual = new GestorLexer();
-       // this.generacionReportes = new GenerarReportes();
+        // this.generacionReportes = new GenerarReportes();
     }
 
     //------------------Fin de la Subregion de gramatica extraidas del config.json----------------------------
@@ -65,7 +64,7 @@ public class LectorEntradas {
     }
 
     //Metodo mas importante para poder analizar el texto y procesarlo
-    public void analizarEntradas(JTextPane paneLog, JTextPane logErrores) throws BadLocationException, ConfigException {
+    public void analizarEntradas(JTextPane paneLog, JTextPane logErrores, JTextPane logTransiciones) throws BadLocationException, ConfigException {
 
         //Valida si la lista viene vacia o si la principal cadena de entrada esta vacia
         if (this.listaTexto.isEmpty()) {
@@ -79,7 +78,7 @@ public class LectorEntradas {
             return;
         }
 
-        AnalizadorLexico automata = new AnalizadorLexico(paneLog, this.listaTexto, logErrores, this.constantesConfig);
+        AnalizadorLexico automata = new AnalizadorLexico(paneLog, this.listaTexto, logErrores, logTransiciones, this.constantesConfig);
         automata.descomponerLexemas(logErrores);
 
         this.lexerActual.setLexer(automata);
@@ -143,8 +142,7 @@ public class LectorEntradas {
     }
 
     //Metodo utilizado para obtener la instancia y generar el reporte 
-   /* public GenerarReportes getGenerarReportes() {
+    /* public GenerarReportes getGenerarReportes() {
         return this.generacionReportes;
     }*/
-
 }

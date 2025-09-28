@@ -230,6 +230,7 @@
                 </Property>
               </Properties>
               <Events>
+                <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="textEdicionArchivoKeyPressed"/>
                 <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="textEdicionArchivoKeyReleased"/>
               </Events>
             </Component>

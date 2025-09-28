@@ -23,8 +23,8 @@ import javax.swing.text.StyledDocument;
  * @author pablo
  */
 public class AnalizadorLexico {
-    
-     //==============================REGION DE APARTADOS DE CONSTANTES GRAMATICA======================================
+
+    //==============================REGION DE APARTADOS DE CONSTANTES GRAMATICA======================================
     //Permite tener la referencia a los datos del json
     private ConfigDatos constantesConfig;
 
@@ -39,10 +39,13 @@ public class AnalizadorLexico {
 
     private JTextPane logErrores;
 
+    //Atributo que permite conservar la referencia para el log de transiciones
+    private JTextPane logTransiciones;
+
     //Se conserva una lista para poder dar el paso al analisis de datos (SOLO ES PROVISIONAL)
     private ArrayList<String> listaEntrada = new ArrayList<>(6000);
 
-    public AnalizadorLexico(JTextPane areaAnalisis, ArrayList<String> listaExtraida, JTextPane paneErrores, ConfigDatos configuracion) throws ConfigException {
+    public AnalizadorLexico(JTextPane areaAnalisis, ArrayList<String> listaExtraida, JTextPane paneErrores, JTextPane logAreaTransicion, ConfigDatos configuracion) throws ConfigException {
         this.areaAnalisis = areaAnalisis;
 
         this.listaEntrada = listaExtraida;
@@ -51,16 +54,18 @@ public class AnalizadorLexico {
 
         this.logErrores = paneErrores;
 
+        this.logTransiciones = logAreaTransicion;
+
         this.analizarEstados = new NavegarEstados(this.constantesConfig, paneErrores);
 
     }
 
     //Metodo que permite que se pueda acceder a la lista sentencias
-    public ArrayList<Sentencia> getListadoSentencias(){
+    public ArrayList<Sentencia> getListadoSentencias() {
         return this.listaSentencias;
     }
-    
-    //Metodo que permite inicializar la separacion de lexemas FINALIZADO
+
+    //Metodo que permite inicializar la separacion de lexemas
     public void descomponerLexemas(JTextPane pane) throws BadLocationException {
 
         pane.setText("");
@@ -69,7 +74,7 @@ public class AnalizadorLexico {
         for (int i = 0; i < listaEntrada.size(); i++) {
             int linea = i + 1;
 
-            String filaTexto = listaEntrada.get(i).trim();
+            String filaTexto = listaEntrada.get(i);
 
             StringBuilder cadenaCompleta = new StringBuilder();
 
@@ -93,12 +98,19 @@ public class AnalizadorLexico {
                     entreComillas = !entreComillas;
                     cadenaCompleta.append(caracter);
 
+                } else if (caracter == '\t' && !entreComillas) {
+
+                    lexemaSeparado.add(new Lexema("    ", linea));
+
                 } else if (Character.isWhitespace(caracter) && !entreComillas) {
 
                     if (cadenaCompleta.length() > 0) {
                         lexemaSeparado.add(new Lexema(cadenaCompleta.toString(), linea));
                         cadenaCompleta.setLength(0);
                     }
+
+                    lexemaSeparado.add(new Lexema(String.valueOf(caracter), linea));
+
                 } else {
                     cadenaCompleta.append(caracter);
                 }
@@ -116,6 +128,7 @@ public class AnalizadorLexico {
 
         }
 
+        //Metodo encargado de poder procesar y convertir todos los lexemas
         for (int i = 0; i < this.listaSentencias.size(); i++) {
 
             Sentencia sentenciaActiva = this.listaSentencias.get(i);
@@ -297,11 +310,15 @@ public class AnalizadorLexico {
     //METODO UNICO QUE SIRVE PARA COLOREAR LOS LOG DE SALIDA
     public void pintarLogSalida(JTextPane paneAnalisis, boolean enAnalisis) throws BadLocationException {
 
-        int caret = paneAnalisis.getCaretPosition();
-        int lineaCaret = paneAnalisis.getDocument().getDefaultRootElement().getElementIndex(caret);
-        int columnaCaret = caret - paneAnalisis.getDocument().getDefaultRootElement().getElement(lineaCaret).getStartOffset();
+        int caretOffset = paneAnalisis.getCaretPosition();
+        StyledDocument doc = paneAnalisis.getStyledDocument();
 
-        //int posicionCaret = this.areaAnalisis.getCaretPosition();
+// Línea y columna reales antes de limpiar
+        int lineaCaret = doc.getDefaultRootElement().getElementIndex(caretOffset);
+        int columnaCaret = caretOffset - doc.getDefaultRootElement()
+                .getElement(lineaCaret)
+                .getStartOffset();
+
         limpiarAreaAnalisis(paneAnalisis);
 
         for (int i = 0; i < this.listaSentencias.size(); i++) {
@@ -310,7 +327,8 @@ public class AnalizadorLexico {
 
             for (Lexema lexemaDado : sentenciaActiva.obtenerListadoLexemas()) {
 
-                if (lexemaDado.getLexema().isBlank()) {
+                if (lexemaDado.getLexema().equals(" ") && lexemaDado.getEstadoAnalisis() == TokenEnum.INDEFINIDO) {
+                    insertarToken(" ", Color.BLACK, paneAnalisis);
                     continue;
                 }
 
@@ -321,24 +339,23 @@ public class AnalizadorLexico {
                     insertarToken(String.valueOf(nodo.getCaracter()), colorTexto, paneAnalisis);
 
                 }
-                insertarToken(" ", Color.BLACK, paneAnalisis);
             }
 
             insertarToken("\n", Color.BLACK, paneAnalisis);
 
         }
 
-        try {
-
-            Element root = paneAnalisis.getDocument().getDefaultRootElement();
-            if (lineaCaret < root.getElementCount()) {
-
-                int nuevaPos = root.getElement(lineaCaret).getStartOffset() + Math.min(columnaCaret, root.getElement(lineaCaret).getEndOffset() - root.getElement(lineaCaret).getStartOffset() - 1);
-                paneAnalisis.setCaretPosition(nuevaPos);
-            }
-
-        } catch (Exception e) {
-            paneAnalisis.setCaretPosition(0);
+        //Se restaura la posicion del caret
+        StyledDocument newDoc = paneAnalisis.getStyledDocument();
+        Element root = newDoc.getDefaultRootElement();
+        if (lineaCaret < root.getElementCount()) {
+            Element lineElem = root.getElement(lineaCaret);
+            int start = lineElem.getStartOffset();
+            int end = lineElem.getEndOffset();
+            int nuevaPos = start + Math.min(columnaCaret, end - start - 1);
+            paneAnalisis.setCaretPosition(nuevaPos);
+        } else {
+            paneAnalisis.setCaretPosition(newDoc.getLength());
         }
 
         mostrarErrores(enAnalisis);
@@ -423,7 +440,7 @@ public class AnalizadorLexico {
     }
 
     //===========================APARTADO PARA GESTIONAR LAS BUSQUEDAS EN EL TEXTO========================================
-    public void busquedaPatrones(JTextPane paneBusqueda, String [] palabraBuscada) throws BadLocationException, ErrorEncontradoException, ErrorPuntualException {
+    public void busquedaPatrones(JTextPane paneBusqueda, String[] palabraBuscada) throws BadLocationException, ErrorEncontradoException, ErrorPuntualException {
 
         pintarLogSalida(paneBusqueda, false);
 
@@ -436,53 +453,19 @@ public class AnalizadorLexico {
 
         //Variable importante para saber si minimo hay una coincidencia
         boolean hayCoincidencia = false;
-        
+
         for (int i = 0; i < palabraBuscada.length; i++) {
             String patron = palabraBuscada[i];
-        
+
             hayCoincidencia = busquedaSofisticada(patron, paneBusqueda);
-        
+
         }
 
-        
         //busqueda sofisticada para encontrar cualquier palabra
         if (hayCoincidencia) {
             return;
         }
-        
-        //BUSQUEDA SIMPLE DE MATCH RAPIDO
-        /*for (int i = 0; i < this.listaSentencias.size(); i++) {
-            Sentencia sentenciaBuscada = this.listaSentencias.get(i);
 
-            for (int j = 0; j < sentenciaBuscada.limiteLexemas(); j++) {
-
-                Lexema lexemaActual = sentenciaBuscada.getListaLexema(j);
-
-                if (lexemaActual.getLexema().equals(palabraBuscada)) {
-                    hayCoincidencia = true;
-
-                    int fila = lexemaActual.getFilaCoordenada() - 1;
-
-                    if (fila < 0) {
-                        fila = 0;
-                    }
-
-                    int columnaInicio = lexemaActual.getValorNodo(0).getColumna() - 1;
-                    if (columnaInicio < 0) {
-                        columnaInicio = 0;
-                    }
-                    int columnaFin = lexemaActual.getValorNodo(lexemaActual.getLongitudNodo() - 1).getColumna();
-                    if (columnaFin < 0) {
-                        columnaFin = 0;
-                    }
-
-                    resaltar(paneBusqueda, fila, columnaInicio, columnaFin);
-                }
-
-            }
-
-        }
-        */
         //busqueda sofisticada para encontrar cualquier palabra
         if (!hayCoincidencia) {
             throw new ErrorPuntualException("No existen patrones relacionados");
@@ -564,5 +547,4 @@ public class AnalizadorLexico {
     }
 
     //===========================FIN DEL APARTADO PARA GESTIONAR LAS BUSQUEDAS EN EL TEXTO========================================
-    
 }

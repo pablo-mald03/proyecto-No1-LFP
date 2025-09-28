@@ -15,10 +15,13 @@ import com.pablocompany.proyectono1lfp.backend.excepciones.ConfigException;
 import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorEncontradoException;
 import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorPuntualException;
 import java.awt.Color;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 import javax.swing.text.BadLocationException;
 
 /**
@@ -47,7 +50,8 @@ public class MenuPrincipal extends javax.swing.JFrame {
      */
     public MenuPrincipal() {
         initComponents();
-
+        configurarTabReal();
+        textEdicionArchivo.setFocusTraversalKeysEnabled(false);
         this.setLocationRelativeTo(null);
 
         ColocarFondos pintarPanel = new ColocarFondos(this, this.panelPrincipal);
@@ -85,6 +89,26 @@ public class MenuPrincipal extends javax.swing.JFrame {
         //Instanica que permite leer los archivos
         this.leerEntradas = new LectorEntradas();
 
+    }
+
+    private void configurarTabReal() {
+        textEdicionArchivo.setFocusTraversalKeysEnabled(false); // permite capturar TAB
+
+        textEdicionArchivo.getInputMap().put(KeyStroke.getKeyStroke("TAB"), "insert-tab");
+        textEdicionArchivo.getActionMap().put("insert-tab", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    textEdicionArchivo.getDocument().insertString(
+                            textEdicionArchivo.getCaretPosition(),
+                            "\t", // inserta un tab real
+                            null
+                    );
+                } catch (BadLocationException ex) {
+                    System.out.println("No fuciona el metodo de tabs");
+                }
+            }
+        });
     }
 
     //===========================================APARTADO DE METODOS QUE SE UTILIZAN PARA DINAMIZAR LA UI===========================================
@@ -158,7 +182,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         operarReportes();
 
     }
-    
+
     //Metodo que genera la interaccion entre generar reportes
     public void generarReporteTokens() {
 
@@ -172,7 +196,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         this.btnDepuracion.setBackground(new Color(0x533F59));
         this.btnReporteTokens.setBackground(new Color(0x4D6E4C));
         this.btnReporteErrores.setBackground(new Color(0x533F59));
-        
+
         operarReportes();
 
     }
@@ -233,10 +257,8 @@ public class MenuPrincipal extends javax.swing.JFrame {
         this.txtBusquedas.requestFocusInWindow();
 
     }
-    
-    //Metodo encargado de ejecutar el reporte de conteo de lexemas
-    
 
+    //Metodo encargado de ejecutar el reporte de conteo de lexemas
     //Metodo que se utiliza para manejar todos los componentes y entrar en el modo depuracion del sistema
     public void modoDepuracion() {
         //Se despliega la ventana emergente para editar la configuracion
@@ -423,6 +445,9 @@ public class MenuPrincipal extends javax.swing.JFrame {
         textEdicionArchivo.setFont(new java.awt.Font("Liberation Serif", 1, 20)); // NOI18N
         textEdicionArchivo.setForeground(new java.awt.Color(115, 112, 112));
         textEdicionArchivo.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                textEdicionArchivoKeyPressed(evt);
+            }
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 textEdicionArchivoKeyReleased(evt);
             }
@@ -741,8 +766,11 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         try {
             //Detecta cada vez que se cambia una palabra
-            this.leerEntradas.transformarTexto(this.textEdicionArchivo.getText(), this.textEdicionArchivo);
-            this.leerEntradas.analizarEntradas(this.textEdicionArchivo, this.textLogErrores);
+            String textoEntradaEdit = this.textEdicionArchivo.getText().replace("\t", "    ");
+
+            this.leerEntradas.transformarTexto(textoEntradaEdit, this.textEdicionArchivo);
+
+            this.leerEntradas.analizarEntradas(this.textEdicionArchivo, this.textLogErrores, this.txtLogTransiciones);
 
         } catch (AnalizadorLexicoException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de Ejecucion", JOptionPane.ERROR_MESSAGE);
@@ -771,7 +799,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
                 this.txtAreaDirectorioArchivo.setText(this.manipuladorDirectorios.getPath());
                 this.yaCargado = true;
 
-                this.leerEntradas.analizarEntradas(this.textEdicionArchivo, this.textLogErrores);
+                this.leerEntradas.analizarEntradas(this.textEdicionArchivo, this.textLogErrores, this.txtLogTransiciones);
 
             }
 
@@ -893,8 +921,11 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         try {
             //Detecta cada vez que se cambia una palabra
-            this.leerEntradas.transformarTexto(this.textEdicionArchivo.getText(), this.textEdicionArchivo);
-            this.leerEntradas.analizarEntradas(this.textEdicionArchivo, this.textLogErrores);
+            String textoEntradaEdit = this.textEdicionArchivo.getText().replace("\t", "      ");
+
+            this.leerEntradas.transformarTexto(textoEntradaEdit, this.textEdicionArchivo);
+
+            this.leerEntradas.analizarEntradas(this.textEdicionArchivo, this.textLogErrores, this.txtLogTransiciones);
 
         } catch (AnalizadorLexicoException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de Ejecucion", JOptionPane.ERROR_MESSAGE);
@@ -945,6 +976,24 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private void txtLogTransicionesKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtLogTransicionesKeyReleased
         // TODO add your handling code here:
     }//GEN-LAST:event_txtLogTransicionesKeyReleased
+
+    private void textEdicionArchivoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textEdicionArchivoKeyPressed
+        //Permite invalidar la tabulacion normal para poner una personalizada
+        if (evt.getKeyCode() == KeyEvent.VK_TAB) {
+            try {
+
+                textEdicionArchivo.getDocument().insertString(
+                        textEdicionArchivo.getCaretPosition(),
+                        "    ",
+                        null
+                );
+                evt.consume();
+            } catch (BadLocationException ex) {
+                System.out.println("Error al posicionar el caret en el log principal");
+            }
+        }
+
+    }//GEN-LAST:event_textEdicionArchivoKeyPressed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
