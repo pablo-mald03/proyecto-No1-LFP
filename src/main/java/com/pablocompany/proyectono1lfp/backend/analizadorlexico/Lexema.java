@@ -13,8 +13,8 @@ import java.util.ArrayList;
  */
 //Clase encargada de manejar palabra por palabra solo contemplando la linea en la que va para reportes
 public class Lexema {
-    
-     //Estructura dinamica encargada de almacenar por completo caracter a caracter
+
+    //Estructura dinamica encargada de almacenar por completo caracter a caracter
     private ArrayList<Nodo> listaNodos = new ArrayList<>(5000);
 
     //Atributo que representa el lexema completo de la palabra
@@ -22,18 +22,21 @@ public class Lexema {
 
     //Representa la linea en la que se encuetra situado el lexema
     private int lineaCoordenada;
-    
+
     //Atributo que permite saber en que posicion del arreglo esta posicionado el lexema
-    private int posicionLexema; 
+    private int posicionLexema;
 
     //AYUDA A DECLARAR EL ESTADO INICIAL AL QUE SERA SOMETIDO EN BASE A LA DETECCION DE PATRON
     private TokenEnum estadoAnalisis;
-    
+
     //Atributo que permite especificar el caracter esperado
-    private String caracterEsperado;
-    
+    private String cadenaEsperada;
+
+    //Atributo que permite especificar LA SUGERENCIA DE PALABRAS(SOLO PARA PALABRAS RESERVADAS )
+    private String sugerenciaEstimada;
+
     //Indica el lexema que causo el error
-    private String lexemaError; 
+    private String lexemaError;
 
     //ATRIBUTO QUE AYUDA A VALIDAR SI YA EL LEXAMA FUE COMPLETAMENTE PROCESADO
     //True si ya
@@ -49,7 +52,6 @@ public class Lexema {
         this.lexemaError = "";
     }
 
-    
     //METODOS QUE PERMITEN SABER EN QUE POSICION DE LA SENTENCIA SE UBICA EL LEXEMA
     public int getPosicionLexema() {
         return posicionLexema;
@@ -68,28 +70,27 @@ public class Lexema {
     public int getLongitudNodo() {
         return this.listaNodos.size();
     }
-    
+
     //Metodo que sirve para ir agregando las cadenas de error detectadas
-    public void setLexemaError(String lexemaEncontrado){
+    public void setLexemaError(String lexemaEncontrado) {
         this.lexemaError = lexemaEncontrado;
     }
-    
+
     //Metodo que retorna la cadena que provoco el error
-    public String getCadenaError(){
+    public String getCadenaError() {
         return this.lexemaError;
     }
 
     //Metodo que permite obtener el caracter o cadena esperada
-    public String getCaracterEsperado() {
-        return caracterEsperado;
+    public String getCadenaEsperada() {
+        return cadenaEsperada;
     }
 
     //Metodo quepermite cambiar el caracter esperado
-    public void setCaracterEsperado(String caracterEsperado) {
-        this.caracterEsperado = caracterEsperado;
+    public void setCadenaEsperada(String caracterEsperado) {
+        this.cadenaEsperada = caracterEsperado;
     }
-    
-    
+
     //Metodo que sirve para retornar el estado inicial del lexema
     public TokenEnum getEstadoAnalisis() {
         return this.estadoAnalisis;
@@ -127,7 +128,7 @@ public class Lexema {
 
     //Metodo encargado para ir clasificando los estados y tipos de todas las letras que componen el lexema
     public int separarNodos(String palabra, int columna, int fila) {
-        
+
         int columnaNodo = columna;
 
         for (int i = 0; i < palabra.length(); i++) {
@@ -168,5 +169,5 @@ public class Lexema {
         throw new AnalizadorLexicoException("No se ha encontrado el indice del nodo");
 
     }
-    
+
 }

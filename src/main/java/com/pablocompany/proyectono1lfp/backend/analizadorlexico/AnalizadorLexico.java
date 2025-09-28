@@ -56,7 +56,7 @@ public class AnalizadorLexico {
 
         this.logTransiciones = logAreaTransicion;
 
-        this.analizarEstados = new NavegarEstados(automataFinitoDeterminista, paneErrores);
+        this.analizarEstados = new NavegarEstados(automataFinitoDeterminista, paneErrores, this.logTransiciones);
 
     }
 
@@ -392,7 +392,9 @@ public class AnalizadorLexico {
         try {
             Color colorTexto = obtenerColorPorToken(lexemaEvaluado.getEstadoAnalisis());
 
-            insertarToken("Con " + lexemaEvaluado.getEstadoAnalisis().getContexto() + ": " + lexemaEvaluado.getLexema(), colorTexto, this.logTransiciones);
+            insertarToken("Con " + lexemaEvaluado.getEstadoAnalisis().getContexto() + ": ", Color.BLACK, this.logTransiciones);
+
+            insertarToken(" " + lexemaEvaluado.getLexema(), colorTexto, this.logTransiciones);
 
             insertarToken("\n", Color.BLACK, this.logTransiciones);
 
@@ -410,7 +412,7 @@ public class AnalizadorLexico {
 
             }
 
-            insertarToken("Guardando token"+" Lexema: " + lexemaEvaluado.getLexema(), new Color(0x085717), this.logTransiciones);
+            insertarToken("Guardando token " + lexemaEvaluado.getEstadoAnalisis().getNombreToken() + ". Lexema: " + lexemaEvaluado.getLexema(), new Color(0x085717), this.logTransiciones);
 
             insertarToken("\n", Color.BLACK, this.logTransiciones);
 

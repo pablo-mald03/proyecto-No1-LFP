@@ -79,7 +79,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         this.gestionVentanas = 0;
         this.yaCargado = false;
         this.txtBusquedas.setVisible(false);
-        this.txtLogBusquedas.setVisible(false);
+        this.txtLogBusquedas.setText("");
 
         editor = new EditorTexto(this.textEdicionArchivo, this.scrollAreaEdicion, this.labelLayout);
 
@@ -358,10 +358,10 @@ public class MenuPrincipal extends javax.swing.JFrame {
         btnAnalisis = new javax.swing.JButton();
         txtBusquedas = new javax.swing.JTextField();
         lblAnalisis = new javax.swing.JLabel();
-        scrollBusquedas = new javax.swing.JScrollPane();
-        txtLogBusquedas = new javax.swing.JTextPane();
         scrollTransiciones = new javax.swing.JScrollPane();
         txtLogTransiciones = new javax.swing.JTextPane();
+        scrollBusquedas = new javax.swing.JScrollPane();
+        txtLogBusquedas = new javax.swing.JTextPane();
         barraLateral = new javax.swing.JPanel();
         btnBusquedaPatrones = new javax.swing.JButton();
         btnReporteErrores = new javax.swing.JButton();
@@ -571,6 +571,19 @@ public class MenuPrincipal extends javax.swing.JFrame {
         jPanel2.add(lblAnalisis);
         lblAnalisis.setBounds(20, 10, 690, 30);
 
+        txtLogTransiciones.setBackground(new java.awt.Color(223, 221, 221));
+        txtLogTransiciones.setFont(new java.awt.Font("Liberation Serif", 1, 20)); // NOI18N
+        txtLogTransiciones.setForeground(new java.awt.Color(140, 1, 25));
+        txtLogTransiciones.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtLogTransicionesKeyReleased(evt);
+            }
+        });
+        scrollTransiciones.setViewportView(txtLogTransiciones);
+
+        jPanel2.add(scrollTransiciones);
+        scrollTransiciones.setBounds(10, 140, 690, 430);
+
         txtLogBusquedas.setBackground(new java.awt.Color(228, 228, 228));
         txtLogBusquedas.setFont(new java.awt.Font("Liberation Serif", 1, 20)); // NOI18N
         txtLogBusquedas.setForeground(new java.awt.Color(140, 1, 25));
@@ -583,19 +596,6 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         jPanel2.add(scrollBusquedas);
         scrollBusquedas.setBounds(10, 140, 690, 430);
-
-        txtLogTransiciones.setBackground(new java.awt.Color(228, 228, 228));
-        txtLogTransiciones.setFont(new java.awt.Font("Liberation Serif", 1, 20)); // NOI18N
-        txtLogTransiciones.setForeground(new java.awt.Color(140, 1, 25));
-        txtLogTransiciones.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                txtLogTransicionesKeyReleased(evt);
-            }
-        });
-        scrollTransiciones.setViewportView(txtLogTransiciones);
-
-        jPanel2.add(scrollTransiciones);
-        scrollTransiciones.setBounds(10, 140, 690, 430);
 
         barraLateral.setBackground(new java.awt.Color(45, 1, 61));
         barraLateral.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(0, 0, 0)));

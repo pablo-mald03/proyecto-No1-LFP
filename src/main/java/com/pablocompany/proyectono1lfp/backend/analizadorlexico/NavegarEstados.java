@@ -4,10 +4,16 @@
  */
 package com.pablocompany.proyectono1lfp.backend.analizadorlexico;
 
+import static com.pablocompany.proyectono1lfp.backend.analizadorlexico.TokenEnum.*;
 import com.pablocompany.proyectono1lfp.backend.excepciones.AnalizadorLexicoException;
 import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorGramaticoException;
 import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorPuntualException;
+import java.awt.Color;
 import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 /**
  *
@@ -15,24 +21,26 @@ import javax.swing.JTextPane;
  */
 //Clase que permite hacer toda la interaccion entre la navegacion entre estados de analisis
 //Permite crear un automata finito que va navegando entre sus propios estados para poder determinar el tipo de token
-
 public class NavegarEstados {
-    
-    
+
+    //Atributo que sirve para poder evaluar el lexema 
     private Lexema lexemaAnalisis;
 
     //==============================REGION DE APARTADOS DE CONSTANTES GRAMATICA======================================
-    private final String DIGITOS = "0123456789";
-    //Permite tener la referencia a los datos del json
+    //Permite tener la referencia de la gramatica del AFD
     private AutomataDeterminista automataDeterminista;
 
     //Atributo que sirve para exponer los errores
     private JTextPane logErrores;
 
+    //Atributo que permite mostrar las tansiciones del automata
+    private JTextPane logTransicionesAFD;
+
     //==============================FIN DE LA REGION DE APARTADOS DE CONSTANTES GRAMATICA======================================
-    public NavegarEstados(AutomataDeterminista constantesConfig, JTextPane logErrores) {
+    public NavegarEstados(AutomataDeterminista constantesConfig, JTextPane logErrores, JTextPane logTransiciones) {
         this.automataDeterminista = constantesConfig;
         this.logErrores = logErrores;
+        this.logTransicionesAFD = logTransiciones;
     }
 
     //Metodo que ayuda a tener permanentemente al tanto la referencia del config
@@ -57,6 +65,9 @@ public class NavegarEstados {
         try {
             declararEstadoInicial(this.lexemaAnalisis, this.lexemaAnalisis.getValorNodo(0));
 
+            //Metodo que permite anunciar el estado que se va a recorrer del lexema
+            anunciarLexema(this.lexemaAnalisis);
+
             StringBuilder registroCadena = new StringBuilder();
 
             for (int j = 0; j < this.lexemaAnalisis.getLongitudNodo(); j++) {
@@ -78,6 +89,8 @@ public class NavegarEstados {
                         int indiceError = this.lexemaAnalisis.getIndiceError();
 
                         this.lexemaAnalisis.getValorNodo(indiceError).setComodin(false);
+
+                        this.lexemaAnalisis.setCadenaEsperada("Se esperaba un " + this.lexemaAnalisis.getEstadoAnalisis().getNombreToken());
 
                         for (int i = indiceError; i >= 0; i--) {
 
@@ -102,6 +115,9 @@ public class NavegarEstados {
                 }
 
             }
+
+            //Se anuncia el final del recorrido
+            anunciarFinalRecorrido(this.lexemaAnalisis);
 
         } catch (ErrorPuntualException ex) {
             try {
@@ -158,7 +174,7 @@ public class NavegarEstados {
             case AGRUPACION:
                 estadoAgrupacion(nodoActual, lexemaInicial, iteracion, cadenaEvaluada);
                 break;
-                
+
             case PUNTUACION:
                 estadoPuntuacion(nodoActual, lexemaInicial, iteracion, cadenaEvaluada);
                 break;
@@ -240,7 +256,7 @@ public class NavegarEstados {
             lexemaParametro.setEstadoAnalisis(TokenEnum.AGRUPACION);
             return;
         }
-        
+
         //Define el estado como agrupacion
         if (this.automataDeterminista.estadoPuntuacion(String.valueOf(nodoCaracterInicio))) {
             lexemaParametro.setEstadoAnalisis(TokenEnum.PUNTUACION);
@@ -248,34 +264,97 @@ public class NavegarEstados {
 
     }
 
+    //===========================APARTADO DEL METODO MAS IMPORTANTE DEL ANALIZADOR LEXICO=======================================
+    //Metodo que anunca el estado que recorrera el AFD
+    private void anunciarLexema(Lexema lexemaOperado) {
+
+        try {
+            Color colorTexto = obtenerColorPorToken(lexemaOperado.getEstadoAnalisis());
+
+            insertarEstadoTransicion("Con " + lexemaOperado.getEstadoAnalisis().getContexto() + ": ", Color.BLACK, this.logTransicionesAFD);
+
+            insertarEstadoTransicion(" " + lexemaOperado.getLexema(), colorTexto, this.logTransicionesAFD);
+
+            insertarEstadoTransicion("\n", Color.BLACK, this.logTransicionesAFD);
+
+        } catch (BadLocationException ex) {
+            System.out.println("No se ha podido pintar el log de transiciones");
+        }
+
+    }
+
+    //Metodo que permite ir ilusatrando estado a estado acorde a lo que vaya recorriendo el AFD
+    private void anunciarEstadoRecorrido(Nodo nodoEstado, int indice, String sujeto) {
+        try {
+            Color colorEstados = new Color(0x0085A6);
+
+            insertarEstadoTransicion("Me movi del estado " + (indice + 1) + " al estado " + (indice + 2) + " con " + sujeto +" ", colorEstados, this.logTransicionesAFD);
+
+            insertarEstadoTransicion(String.valueOf(nodoEstado.getCaracter()), new Color(0x292724), this.logTransicionesAFD);
+
+            insertarEstadoTransicion("\n", Color.BLACK, this.logTransicionesAFD);
+
+        } catch (BadLocationException ex) {
+            System.out.println("No se ha podido pintar el log de transiciones");
+        }
+
+    }
+
+    //Metodo que permite anunciar el reinicio del automata y guardado del lexema
+    private void anunciarFinalRecorrido(Lexema lexemaEvaluado) {
+        try {
+
+            insertarEstadoTransicion("Guardando token " + lexemaEvaluado.getEstadoAnalisis().getNombreToken() + ". Lexema: " + lexemaEvaluado.getLexema(), new Color(0x085717), this.logTransicionesAFD);
+
+            insertarEstadoTransicion("\n", Color.BLACK, this.logTransicionesAFD);
+
+            insertarEstadoTransicion("Reiniciando Automata...", Color.BLACK, this.logTransicionesAFD);
+
+            insertarEstadoTransicion("\n", Color.BLACK, this.logTransicionesAFD);
+            insertarEstadoTransicion("\n", Color.BLACK, this.logTransicionesAFD);
+
+        } catch (BadLocationException ex) {
+            System.out.println("No se ha podido pintar el log de transiciones");
+        }
+
+    }
+
+    //===========================FIN DEL APARTADO DEL METODO MAS IMPORTANTE DEL ANALIZADOR LEXICO=======================================
     //===========================APARTADO DE METODOS QUE SIRVEN PARA IR DECLARANDO ESTADOS================================
     //Metodo que permite comparar si son signos de agrupacion en conjunto
     public void estadoPuntuacion(Nodo nodoActual, Lexema lexemaUtilizado, int indice, String palabraEvaluada) throws ErrorGramaticoException {
 
         char caracterNodo = nodoActual.getCaracter();
-        
+
         if (!this.automataDeterminista.estadoPuntuacion(String.valueOf(caracterNodo))) {
             nodoActual.setComodin(true);
             throw new ErrorGramaticoException(" Caracter de Puntuacion no registrado en " + palabraEvaluada);
         }
 
+        //Se anuncia el caracter con el que se mueve de estado el automata
+        anunciarEstadoRecorrido(nodoActual, indice, "un");
+
         nodoActual.setTipo(TokenEnum.PUNTUACION);
 
     }
-    
+
     //Metodo que permite comparar si son signos de agrupacion en conjunto
     public void estadoAgrupacion(Nodo nodoActual, Lexema lexemaUtilizado, int indice, String palabraEvaluada) throws ErrorGramaticoException {
 
         char caracterNodo = nodoActual.getCaracter();
-        
+
         if (!this.automataDeterminista.estadoAgrupacion(caracterNodo)) {
             nodoActual.setComodin(true);
             throw new ErrorGramaticoException(" Signo de agrupacion no registrado en " + palabraEvaluada);
         }
 
+        //Se anuncia el caracter con el que se mueve de estado el automata
+        anunciarEstadoRecorrido(nodoActual, indice, "una");
+
         nodoActual.setTipo(TokenEnum.AGRUPACION);
 
     }
+
     //Metodo que permite comparar si son operadores en conjunto
     public void estadoOperador(Nodo nodoActual, Lexema lexemaUtilizado, int indice, String palabraEvaluada) throws ErrorGramaticoException {
 
@@ -285,6 +364,9 @@ public class NavegarEstados {
             nodoActual.setComodin(true);
             throw new ErrorGramaticoException(" Operador no registrado en " + palabraEvaluada);
         }
+
+        //Se anuncia el caracter con el que se mueve de estado el automata
+        anunciarEstadoRecorrido(nodoActual, indice, "un");
 
         nodoActual.setTipo(TokenEnum.OPERADOR);
 
@@ -305,6 +387,9 @@ public class NavegarEstados {
             nodoActual.setComodin(true);
             throw new ErrorGramaticoException(" No es letra ni numero en " + palabraEvaluada);
         }
+
+        //Se anuncia el caracter con el que se mueve de estado el automata
+        anunciarEstadoRecorrido(nodoActual, indice, "una");
 
         nodoActual.setTipo(TokenEnum.IDENTIFICADOR);
 
@@ -349,6 +434,9 @@ public class NavegarEstados {
             throw new ErrorGramaticoException(" Caracter no admitido " + palabraEvaluada);
         }
 
+        //Se anuncia el caracter con el que se mueve de estado el automata
+        anunciarEstadoRecorrido(nodoActual, indice, "un");
+
         nodoActual.setTipo(TokenEnum.NUMERO);
 
     }
@@ -391,6 +479,9 @@ public class NavegarEstados {
             throw new ErrorGramaticoException(" Sin digitos despues del punto en " + palabraEvaluada);
         }
 
+        //Se anuncia el caracter con el que se mueve de estado el automata
+        anunciarEstadoRecorrido(nodoActual, indice, "un");
+
         nodoActual.setTipo(TokenEnum.DECIMAL);
     }
 
@@ -412,9 +503,53 @@ public class NavegarEstados {
             return;
         }
 
+        //Se anuncia el caracter con el que se mueve de estado el automata
+        anunciarEstadoRecorrido(nodoActual, indice, "una");
+
         nodoActual.setTipo(TokenEnum.CADENA);
     }
 
+    //APARTADO DE METODOS DE PINTADO DE LAS TRANSICIONES DEL AUTOMATA (TOCA HACERLAS DESDE EL BE)
+    // Método para insertar texto con un color específico
+    private void insertarEstadoTransicion(String texto, Color color, JTextPane paneTransiciones) throws BadLocationException {
+
+        StyledDocument doc = paneTransiciones.getStyledDocument();
+
+        SimpleAttributeSet estilo = new SimpleAttributeSet();
+        StyleConstants.setForeground(estilo, color);
+
+        doc.insertString(doc.getLength(), texto, estilo);
+
+    }
+
+    // Método que mapea el token a su color
+    private Color obtenerColorPorToken(TokenEnum tipo) {
+        switch (tipo) {
+            case PALABRA_RESERVADA:
+                return Color.BLUE;
+            case IDENTIFICADOR:
+                return new Color(0x6B4627);
+            case NUMERO:
+                return new Color(0x1FC23B);
+            case DECIMAL:
+                return Color.BLACK;
+            case CADENA:
+                return new Color(0xF0760E);
+            case COMENTARIO_LINEA:
+            case COMENTARIO_BLOQUE:
+                return new Color(0x1B6615);
+            case OPERADOR:
+                return new Color(0xB5AB2D);
+            case AGRUPACION:
+                return new Color(0x991CB8);
+            case PUNTUACION:
+                return new Color(0x329481);
+            case ERROR:
+                return Color.RED;
+            default:
+                return new Color(0x9E7A7A);
+        }
+    }
+
     //===========================FIN DEL APARTADO DE METODOS QUE SIRVEN PARA IR DECLARANDO ESTADOS==============================
-    
 }

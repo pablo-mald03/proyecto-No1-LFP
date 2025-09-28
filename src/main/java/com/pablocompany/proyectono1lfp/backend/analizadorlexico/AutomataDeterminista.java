@@ -4,23 +4,6 @@
  */
 package com.pablocompany.proyectono1lfp.backend.analizadorlexico;
 
-import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorEncontradoException;
-import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorPuntualException;
-import java.awt.Color;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.JTextPane;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 
 /**
  *
