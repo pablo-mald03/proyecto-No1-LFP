@@ -66,9 +66,9 @@ public class AnalizadorLexico {
     }
 
     //Metodo que permite inicializar la separacion de lexemas
-    public void descomponerLexemas(JTextPane pane) throws BadLocationException {
+    public void descomponerLexemas(JTextPane paneError) throws BadLocationException {
 
-        pane.setText("");
+        paneError.setText("");
 
         //Ciclo que permite recorrer linea por linea para ir generando las instancias e indicar en que linea estan 
         for (int i = 0; i < listaEntrada.size(); i++) {
@@ -197,28 +197,28 @@ public class AnalizadorLexico {
     public boolean buscarGeneralizacionesAFD(Lexema lexemaActual, Sentencia lineaPosicionada, ArrayList<Sentencia> listaSentencias, int iterador) {
 
         //Detecta si es palabra reservada directamente
-        if (this.automataFinitoDeterminista.esPalabrasReservadas(lexemaActual.getLexema())) {
+        if (this.automataFinitoDeterminista.estadoPalabrasReservadas(lexemaActual.getLexema())) {
             lexemaActual.generalizarNodo(TokenEnum.PALABRA_RESERVADA);
             lexemaActual.setYaDeclarado(true);
             return true;
         }
 
         //Detecta si es operador directamente
-        if (lexemaActual.getLongitudNodo() == 1 && this.automataFinitoDeterminista.esOperadores(lexemaActual.getLexema().charAt(0))) {
+        if (lexemaActual.getLongitudNodo() == 1 && this.automataFinitoDeterminista.estadoOperadoresMatematicos(lexemaActual.getLexema().charAt(0))) {
             lexemaActual.generalizarNodo(TokenEnum.OPERADOR);
             lexemaActual.setYaDeclarado(true);
             return true;
         }
 
         //Detecta si es signo de agrupacion directamente
-        if (lexemaActual.getLongitudNodo() == 1 && this.automataFinitoDeterminista.esAgrupacion(lexemaActual.getLexema().charAt(0))) {
+        if (lexemaActual.getLongitudNodo() == 1 && this.automataFinitoDeterminista.estadoAgrupacion(lexemaActual.getLexema().charAt(0))) {
             lexemaActual.generalizarNodo(TokenEnum.AGRUPACION);
             lexemaActual.setYaDeclarado(true);
             return true;
         }
 
         //Detecta si es signo de puntuacion directamente
-        if (lexemaActual.getLongitudNodo() == 1 && this.automataFinitoDeterminista.esPuntuacion(lexemaActual.getLexema().charAt(0))) {
+        if (lexemaActual.getLongitudNodo() == 1 && this.automataFinitoDeterminista.estadoPuntuacion(String.valueOf(lexemaActual.getLexema().charAt(0)))) {
             lexemaActual.generalizarNodo(TokenEnum.PUNTUACION);
             lexemaActual.setYaDeclarado(true);
             return true;

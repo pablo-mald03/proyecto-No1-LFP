@@ -22,36 +22,22 @@ public class NavegarEstados {
     private Lexema lexemaAnalisis;
 
     //==============================REGION DE APARTADOS DE CONSTANTES GRAMATICA======================================
-    // Letras
-    private final String ABECEDARIO = "abcdefghijklmnopqrstuvwxyz";
     private final String DIGITOS = "0123456789";
     //Permite tener la referencia a los datos del json
-    private AutomataDeterminista constantesConfig;
+    private AutomataDeterminista automataDeterminista;
 
     //Atributo que sirve para exponer los errores
     private JTextPane logErrores;
 
     //==============================FIN DE LA REGION DE APARTADOS DE CONSTANTES GRAMATICA======================================
     public NavegarEstados(AutomataDeterminista constantesConfig, JTextPane logErrores) {
-        this.constantesConfig = constantesConfig;
+        this.automataDeterminista = constantesConfig;
         this.logErrores = logErrores;
     }
 
-    //Metodo simplificado para simular el match de caracteres
-    //Detecta si existe el caracter en la gramatica
-    public boolean esLetra(char c) {
-        String caracter = String.valueOf(c).toLowerCase();
-        return ABECEDARIO.contains(caracter);
-    }
-
-    public boolean esDigito(char c) {
-        String caracter = String.valueOf(c).toLowerCase();
-        return DIGITOS.contains(caracter);
-    }
-
     //Metodo que ayuda a tener permanentemente al tanto la referencia del config
-    public void setConstantesConfig(AutomataDeterminista constantesConfig) {
-        this.constantesConfig = constantesConfig;
+    public void setConstantesConfig(AutomataDeterminista constantesAutomata) {
+        this.automataDeterminista = constantesAutomata;
         if (this.lexemaAnalisis != null) {
             this.lexemaAnalisis = null;
         }
@@ -232,31 +218,31 @@ public class NavegarEstados {
         }
 
         //Declara el estado de analisis como identificador
-        if (esLetra(nodoCaracterInicio)) {
+        if (this.automataDeterminista.estadoLetras(String.valueOf(nodoCaracterInicio))) {
             lexemaParametro.setEstadoAnalisis(TokenEnum.IDENTIFICADOR);
             return;
         }
 
         //Declara el estado como numerico (ESTE TIENE LA CAPACIDAD DE COMUNICARSE CON DECIMAL)
-        if (esDigito(nodoCaracterInicio)) {
+        if (this.automataDeterminista.estadoNumerico(String.valueOf(nodoCaracterInicio))) {
             lexemaParametro.setEstadoAnalisis(TokenEnum.NUMERO);
             return;
         }
 
         //Define el estado como operador
-        if (this.constantesConfig.esOperadores(nodoCaracterInicio)) {
+        if (this.automataDeterminista.estadoOperadoresMatematicos(nodoCaracterInicio)) {
             lexemaParametro.setEstadoAnalisis(TokenEnum.OPERADOR);
             return;
         }
 
         //Define el estado como agrupacion
-        if (this.constantesConfig.esAgrupacion(nodoCaracterInicio)) {
+        if (this.automataDeterminista.estadoAgrupacion(nodoCaracterInicio)) {
             lexemaParametro.setEstadoAnalisis(TokenEnum.AGRUPACION);
             return;
         }
         
         //Define el estado como agrupacion
-        if (this.constantesConfig.esPuntuacion(nodoCaracterInicio)) {
+        if (this.automataDeterminista.estadoPuntuacion(String.valueOf(nodoCaracterInicio))) {
             lexemaParametro.setEstadoAnalisis(TokenEnum.PUNTUACION);
         }
 
@@ -268,7 +254,7 @@ public class NavegarEstados {
 
         char caracterNodo = nodoActual.getCaracter();
         
-        if (!this.constantesConfig.esPuntuacion(caracterNodo)) {
+        if (!this.automataDeterminista.estadoPuntuacion(String.valueOf(caracterNodo))) {
             nodoActual.setComodin(true);
             throw new ErrorGramaticoException(" Caracter de Puntuacion no registrado en " + palabraEvaluada);
         }
@@ -282,7 +268,7 @@ public class NavegarEstados {
 
         char caracterNodo = nodoActual.getCaracter();
         
-        if (!this.constantesConfig.esAgrupacion(caracterNodo)) {
+        if (!this.automataDeterminista.estadoAgrupacion(caracterNodo)) {
             nodoActual.setComodin(true);
             throw new ErrorGramaticoException(" Signo de agrupacion no registrado en " + palabraEvaluada);
         }
@@ -295,7 +281,7 @@ public class NavegarEstados {
 
         char caracterNodo = nodoActual.getCaracter();
 
-        if (!this.constantesConfig.esOperadores(caracterNodo)) {
+        if (!this.automataDeterminista.estadoOperadoresMatematicos(caracterNodo)) {
             nodoActual.setComodin(true);
             throw new ErrorGramaticoException(" Operador no registrado en " + palabraEvaluada);
         }
@@ -310,12 +296,12 @@ public class NavegarEstados {
 
         char caracterNodo = nodoActual.getCaracter();
 
-        if (this.constantesConfig.esAgrupacion(caracterNodo) || this.constantesConfig.esOperadores(caracterNodo) || this.constantesConfig.esPuntuacion(caracterNodo)) {
+        if (this.automataDeterminista.estadoAgrupacion(caracterNodo) || this.automataDeterminista.estadoOperadoresMatematicos(caracterNodo) || this.automataDeterminista.estadoPuntuacion(String.valueOf(caracterNodo))) {
             nodoActual.setComodin(true);
             throw new ErrorGramaticoException(" Caracter especial no permitido en " + palabraEvaluada);
         }
 
-        if (!esLetra(caracterNodo) && !esDigito(caracterNodo)) {
+        if (!this.automataDeterminista.estadoLetras(String.valueOf(caracterNodo)) && !this.automataDeterminista.estadoNumerico(String.valueOf(caracterNodo))) {
             nodoActual.setComodin(true);
             throw new ErrorGramaticoException(" No es letra ni numero en " + palabraEvaluada);
         }
@@ -348,17 +334,17 @@ public class NavegarEstados {
             return;
         }
 
-        if (esLetra(caracterNodo)) {
+        if (this.automataDeterminista.estadoLetras(String.valueOf(caracterNodo))) {
             nodoActual.setComodin(true);
             throw new ErrorGramaticoException(" Letras no permitidas en " + palabraEvaluada);
         }
 
-        if (this.constantesConfig.esAgrupacion(caracterNodo) || this.constantesConfig.esOperadores(caracterNodo) || this.constantesConfig.esPuntuacion(caracterNodo)) {
+        if (this.automataDeterminista.estadoAgrupacion(caracterNodo) || this.automataDeterminista.estadoOperadoresMatematicos(caracterNodo) || this.automataDeterminista.estadoPuntuacion(String.valueOf(caracterNodo))) {
             nodoActual.setComodin(true);
             throw new ErrorGramaticoException(" Caracter especial no permitido en " + palabraEvaluada);
         }
 
-        if (!esDigito(caracterNodo)) {
+        if (!this.automataDeterminista.estadoNumerico(String.valueOf(caracterNodo))) {
             nodoActual.setComodin(true);
             throw new ErrorGramaticoException(" Caracter no admitido " + palabraEvaluada);
         }
@@ -388,12 +374,12 @@ public class NavegarEstados {
             throw new ErrorGramaticoException(" No se puede poner doble punto decimal en " + palabraEvaluada);
         }
 
-        if (esLetra(caracterNodo)) {
+        if (this.automataDeterminista.estadoLetras(String.valueOf(caracterNodo))) {
             nodoActual.setComodin(true);
             throw new ErrorGramaticoException(" Letras no permitidas en " + palabraEvaluada);
         }
 
-        if (!esDigito(caracterNodo) && caracterNodo != '.') {
+        if (!this.automataDeterminista.estadoNumerico(String.valueOf(caracterNodo)) && caracterNodo != '.') {
 
             nodoActual.setComodin(true);
             throw new ErrorGramaticoException(" Caracter no admitido " + palabraEvaluada);
@@ -416,7 +402,7 @@ public class NavegarEstados {
 
         String valorVacio = String.valueOf(caracterNodo);
 
-        if (!valorVacio.isBlank() && caracterNodo != '"' && !esLetra(caracterNodo) && !esDigito(caracterNodo) && !this.constantesConfig.esAgrupacion(caracterNodo) && !this.constantesConfig.esOperadores(caracterNodo) && !this.constantesConfig.esPuntuacion(caracterNodo)) {
+        if (!valorVacio.isBlank() && caracterNodo != '"' && !this.automataDeterminista.estadoLetras(String.valueOf(caracterNodo)) && !this.automataDeterminista.estadoNumerico(String.valueOf(caracterNodo)) && !this.automataDeterminista.estadoAgrupacion(caracterNodo) && !this.automataDeterminista.estadoOperadoresMatematicos(caracterNodo) && !this.automataDeterminista.estadoPuntuacion(String.valueOf(caracterNodo))) {
             nodoActual.setComodin(true);
             throw new ErrorGramaticoException(" Caracter no admitido en " + palabraEvaluada);
         }

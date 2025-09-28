@@ -31,67 +31,50 @@ import javax.swing.text.StyledDocument;
 public class AutomataDeterminista {
 
     //APARTADO DE EXPRESIONES REGULARES QUE PERMITEN VALIDAR LOS ESTADOS DEL AUTOMATA FINITO DETERMINISTA
+    //Expresiones regulares de comentarios
     private final String ER_COMENTARIO = "^//$";
-    private final String ER_COMENTARIO_MULTI_INICIO = "^/\\*$";  
+    private final String ER_COMENTARIO_MULTI_INICIO = "^/\\*$";
     private final String ER_COMENTARIO_MULTI_FIN = "^\\*/$";
 
-    //DIRECTORIO PRINCIPAL
-    private final String CONFIG_PATH = "configuracion/config.json";
+    //Expresion regular para identificar las palabras reservadas 
+    private final String ER_PALABRAS_RESERVADAS = "^(SI|si|ENTONCES|entonces|PARA|para|ESCRIBIR|escribir)$";
 
-    private ArrayList<String> palabrasReservadas = new ArrayList<>();
-    private ArrayList<String> operadores = new ArrayList<>();
-    private ArrayList<String> puntuacion = new ArrayList<>();
-    private ArrayList<String> agrupacion = new ArrayList<>();
+    //Expresion regular que permite identificar los signos de puntuacion 
+    private final String ER_SIGNOS_PUNTUACION = "^[.,:;]$";
 
-    //PATH CONSTANTE QUE PERMITE REINICIAR POR DEFECTO LA CONFIGURACION SI EN DADO CASO YA HAYA SIDO MODIFICADA
-    private final List<String> CONFIG_DEFAULT = new ArrayList<String>() {
-        {
-            add("{");
-            add(" \"palabrasReservadas\": [\"SI\",\"si\",\"ENTONCES\",\"entonces\",\"PARA\",\"para\"],");
-            add("");
-            add(" \"operadores\": [\"+\",\"-\",\"*\",\"/\",\"%\",\"=\"],");
-            add(" \"puntuacion\": [\".\", \",\",\";\",\":\"],");
-            add(" \"agrupacion\": [\"(\",\")\",\"[\",\"]\",\"{\",\"}\"],");
-            add(" \"comentarios\": {");
-            add("   \"linea\": \"//\",");
-            add("   \"bloqueInicio\": \"/*\",");
-            add("   \"bloqueFin\": \"*/\"");
-            add("");
-            add("}");
-            add("");
-            add("");
-            add("");
-            add("}");
-        }
-    };
+    //Expresion regular que permite identificar los operadores aritmetico
+    private final String ER_OPERADORES_MATEMATICOS = "^(\\+|\\-|\\*|/|%|=)$";
 
-    private Comentarios comments;
+    //Expresion regular que permite identificar los signos de agrupacion
+    private final String ER_SIGNOS_AGRUPACION = "^[(){}\\[\\]]$";
 
-    //Lista temporal que permite mostrar en pantalla el config
-    private ArrayList<String> listaTemporal = new ArrayList<>(5000);
+    //Expresion regular que permite identificar los digitos
+    private final String ER_NUMEROS = "^(0|1|2|3|4|5|6|7|8|9)$";
 
-    public AutomataDeterminista() {
-        this.comments = new Comentarios();
-    }
+    //Expresion regular que permite identificar si son letras minusculas
+    private final String ER_MINUSCULAS = "^(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)$";
+
+    //Expresion regular que permite identificar si son letras minusculas
+    private final String ER_MAYUSCULAS = "^(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z)$";
 
     //Verifica que sea paralabra reservada
-    public boolean esPalabrasReservadas(String palabra) {
-        return palabrasReservadas.contains(palabra);
+    public boolean estadoPalabrasReservadas(String palabra) {
+        return palabra.matches(ER_PALABRAS_RESERVADAS);
     }
 
     //Verifica que sea operador matematico
-    public boolean esOperadores(char operador) {
-        return operadores.contains(String.valueOf(operador));
+    public boolean estadoOperadoresMatematicos(char operador) {
+        return String.valueOf(operador).matches(ER_OPERADORES_MATEMATICOS);
     }
 
     //Verifica que sea signo de puntuacion
-    public boolean esPuntuacion(char puntuar) {
-        return puntuacion.contains(String.valueOf(puntuar));
+    public boolean estadoPuntuacion(String puntuar) {
+        return puntuar.matches(ER_SIGNOS_PUNTUACION);
     }
 
     //Verifica que sea simbolo de agrupacion
-    public boolean esAgrupacion(char agrupar) {
-        return agrupacion.contains(String.valueOf(agrupar));
+    public boolean estadoAgrupacion(char agrupar) {
+        return String.valueOf(agrupar).matches(ER_SIGNOS_AGRUPACION);
     }
 
     //Verifica que sea comentario de una sola linea
@@ -109,409 +92,14 @@ public class AutomataDeterminista {
         return fin.matches(ER_COMENTARIO_MULTI_FIN);
     }
 
-    // Método para inicializar archivo config.json si no existe
-    private void initConfig() {
-        File archivo = new File(CONFIG_PATH);
-
-        if (!archivo.getParentFile().exists()) {
-            archivo.getParentFile().mkdirs();
-        }
-
-        if (!archivo.exists()) {
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(archivo))) {
-                for (String linea : CONFIG_DEFAULT) {
-                    bw.write(linea);
-                    bw.newLine();
-                }
-            } catch (IOException ex) {
-                System.out.println("Esta pendiente");
-            }
-        }
+    //Verifica que sean letras del alfaneto definido
+    public boolean estadoLetras(String letra) {
+        return letra.matches(ER_MINUSCULAS) || letra.matches(ER_MAYUSCULAS);
     }
 
-    //Metodo que se encarga de leer y procesar todo a arrayList
-    public void cargarDesdeJson() {
-
-        if (!this.palabrasReservadas.isEmpty()) {
-            this.palabrasReservadas.clear();
-        }
-
-        if (!this.operadores.isEmpty()) {
-            this.operadores.clear();
-        }
-        if (!this.puntuacion.isEmpty()) {
-            this.puntuacion.clear();
-        }
-        if (!this.agrupacion.isEmpty()) {
-            this.agrupacion.clear();
-        }
-
-        initConfig();
-        StringBuilder sb = new StringBuilder();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(CONFIG_PATH))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                sb.append(linea.trim());
-            }
-
-            String json = sb.toString();
-
-            this.palabrasReservadas = extraerArray(json, "palabrasReservadas");
-            this.operadores = extraerArray(json, "operadores");
-            this.puntuacion = extraerArray(json, "puntuacion");
-            this.agrupacion = extraerArray(json, "agrupacion");
-
-            cargarComentarios(json);
-
-        } catch (IOException ex) {
-
-            //PENDIENTE
-            System.out.println("Pendiente de tratar");
-        }
-
-    }
-
-    //Metodo que sirve para extraer del .json toda la configuracion de tokens
-    private ArrayList<String> extraerArray(String json, String clave) {
-        ArrayList<String> lista = new ArrayList<>();
-        int pos = json.indexOf("\"" + clave + "\"");
-        if (pos == -1) {
-            return lista;
-        }
-
-        pos = json.indexOf("[", pos);
-        if (pos == -1) {
-            return lista;
-        }
-
-        int fin = pos + 1;
-        boolean dentroComillas = false;
-        StringBuilder elemento = new StringBuilder();
-
-        while (fin < json.length()) {
-            char c = json.charAt(fin);
-            if (c == '"') {
-                dentroComillas = !dentroComillas;
-            } else if (c == ',' && !dentroComillas) {
-                if (elemento.length() > 0) {
-                    lista.add(elemento.toString().trim());
-                    elemento.setLength(0);
-                }
-            } else if (c == ']' && !dentroComillas) {
-                if (elemento.length() > 0) {
-                    lista.add(elemento.toString().trim());
-                }
-                break;
-            } else {
-                elemento.append(c);
-            }
-            fin++;
-        }
-
-        return lista;
-
-    }
-
-//Metodo que se encarga de instanciar todos los comentarios PENDIENTE
-    private void cargarComentarios(String cargado) {
-
-        String json = cargado;
-
-        int inicio = json.indexOf("\"comentarios\"") + "\"comentarios\"".length();
-        inicio = json.indexOf("{", inicio);
-
-        int fin = json.indexOf("}", inicio);
-
-        String comentariosJson = json.substring(inicio + 1, fin).trim();
-
-        String linea = null;
-        String bloqueInicio = null;
-        String bloqueFin = null;
-
-        for (String parte : comentariosJson.split(",")) {
-            String[] keyValue = parte.split(":");
-            if (keyValue.length != 2) {
-                continue;
-            }
-
-            String key = keyValue[0].trim().replace("\"", "");
-            String value = keyValue[1].trim().replace("\"", "");
-
-            switch (key) {
-                case "linea" ->
-                    linea = value;
-                case "bloqueInicio" ->
-                    bloqueInicio = value;
-                case "bloqueFin" ->
-                    bloqueFin = value;
-            }
-        }
-
-        this.comments.setLinea(linea);
-        this.comments.setBloqueInicio(bloqueInicio);
-        this.comments.setBloqueFin(bloqueFin);
-
-    }
-
-    //=====================APARTADO DE METODOS QUE SIRVEN PARA PODER MOSTRAR EN LA UI LA CONFIGURACION========================
-    //Metodo que permite transformar todo el texto de entrada de config al arreglo 
-    public void mostrarConfiguracion(JTextPane paneLog) throws ErrorPuntualException, BadLocationException, IOException {
-
-        if (!this.listaTemporal.isEmpty()) {
-            this.listaTemporal.clear();
-        }
-
-        initConfig();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(CONFIG_PATH))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                this.listaTemporal.add(linea);
-
-            }
-        } catch (IOException ex) {
-            throw new ErrorPuntualException("No se ha podido procesar el archivo seleccionado");
-        }
-
-        if (this.listaTemporal.isEmpty()) {
-            throw new ErrorPuntualException("El archivo esta vacio");
-        }
-        //METODO UNICO QUE SIRVE PARA MOSTRAR EL CONFIG EN PANTALLA
-        pintarLogConfig(paneLog);
-
-    }
-
-    //Permite validar que el archivo tenga el formato correcto
-    public boolean comprobarEntradas(String texto) throws ErrorEncontradoException {
-
-        if (!this.listaTemporal.isEmpty()) {
-            this.listaTemporal.clear();
-        }
-
-        try (BufferedReader bufer = new BufferedReader(new StringReader(texto))) {
-            String linea;
-            while ((linea = bufer.readLine()) != null) {
-                this.listaTemporal.add(linea);
-            }
-        } catch (IOException ex) {
-            throw new ErrorEncontradoException("No se ha podido procesar el texto de entrada");
-        }
-
-        return validarConfig(this.listaTemporal);
-    }
-
-    //Metodo que sirve para validar que el formato se mantenga integro
-    public boolean validarConfig(ArrayList<String> lineas) throws ErrorEncontradoException {
-        int llaves = 0, corchetes = 0, comillas = 0;
-
-        boolean tienePalabras = false;
-        boolean tieneOperadores = false;
-        boolean tienePuntuacion = false;
-        boolean tieneAgrupacion = false;
-        boolean tieneComentarios = false;
-
-        for (String linea : lineas) {
-            // Contar balance de llaves y corchetes
-            for (char c : linea.toCharArray()) {
-                if (c == '{') {
-                    llaves++;
-                }
-                if (c == '}') {
-                    llaves--;
-                }
-                if (c == '[') {
-                    corchetes++;
-                }
-                if (c == ']') {
-                    corchetes--;
-                }
-                if (c == '"') {
-                    comillas++;
-                }
-            }
-
-            // Validar existencia de bloques obligatorios
-            if (linea.contains("\"palabrasReservadas\"")) {
-                tienePalabras = true;
-            }
-            if (linea.contains("\"operadores\"")) {
-                tieneOperadores = true;
-            }
-            if (linea.contains("\"puntuacion\"")) {
-                tienePuntuacion = true;
-            }
-            if (linea.contains("\"agrupacion\"")) {
-                tieneAgrupacion = true;
-            }
-            if (linea.contains("\"comentarios\"")) {
-                tieneComentarios = true;
-            }
-        }
-
-        if (llaves != 0) {
-            throw new ErrorEncontradoException("Llaves Sin cierre o apertura");
-        }
-
-        if (corchetes != 0) {
-            throw new ErrorEncontradoException("Corchetes Sin cierre o apertura");
-        }
-        if (comillas % 2 != 0) {
-            throw new ErrorEncontradoException("Comillas Sin cierre o apertura");
-        }
-
-        // Revisar secciones obligatorias
-        if (!tienePalabras) {
-            throw new ErrorEncontradoException("Falta sección 'palabrasReservadas'\nNo puedes cambiarle nombre");
-        }
-        if (!tieneOperadores) {
-            throw new ErrorEncontradoException("Falta sección 'operadores'\nNo puedes cambiarle nombre");
-        }
-        if (!tienePuntuacion) {
-            throw new ErrorEncontradoException("Falta sección 'puntuacion'\nNo puedes cambiarle nombre");
-        }
-        if (!tieneAgrupacion) {
-            throw new ErrorEncontradoException("Falta sección 'agrupacion'\nNo puedes cambiarle nombre");
-        }
-        if (!tieneComentarios) {
-            throw new ErrorEncontradoException("Falta sección 'comentarios'");
-        }
-
-        // Validar que la sección comentarios sea EXACTA
-        String bloqueEsperado = "   \"comentarios\": {\n     \"linea\": \"//\",\n     \"bloqueInicio\": \"/*\",\n     \"bloqueFin\": \"*/\"\n   }";
-
-        StringBuilder bloqueLeido = new StringBuilder();
-        boolean dentroComentarios = false;
-        for (String linea : lineas) {
-            if (linea.contains("\"comentarios\"")) {
-                dentroComentarios = true;
-            }
-            if (dentroComentarios) {
-                bloqueLeido.append(linea.trim()).append("\n");
-                if (linea.contains("}")) {
-                    dentroComentarios = false;
-                }
-            }
-        }
-
-        if (!bloqueLeido.toString().contains("\"linea\": \"//\"")
-                || !bloqueLeido.toString().contains("\"bloqueInicio\": \"/*\"")
-                || !bloqueLeido.toString().contains("\"bloqueFin\": \"*/\"")) {
-            throw new ErrorEncontradoException(" NO PUEDES ALTERAR LA SECCION 'comentarios' alterada.");
-        }
-        return true;
-    }
-
-    //Metodo que se encarga de mostrar el archivo de configuracion en pantalla
-    public void pintarLogConfig(JTextPane paneAnalisis) throws BadLocationException {
-
-        if (!paneAnalisis.getText().isBlank()) {
-            limpiarArea(paneAnalisis);
-        }
-
-        for (int i = 0; i < this.listaTemporal.size(); i++) {
-            String palabra = this.listaTemporal.get(i);
-
-            boolean dentroComillas = false;
-
-            for (int j = 0; j < palabra.length(); j++) {
-                char caracter = palabra.charAt(j);
-
-                // si es comilla, alternamos el estado
-                if (caracter == '"') {
-                    dentroComillas = !dentroComillas;
-                    insertarPalabra(String.valueOf(caracter), Color.BLUE, paneAnalisis); // comillas azules por ejemplo
-                    continue;
-                }
-
-                if (dentroComillas) {
-                    // todo lo que está dentro de comillas, lo pintamos del mismo color
-                    insertarPalabra(String.valueOf(caracter), new Color(0x297318), paneAnalisis);
-                } else {
-                    // fuera de comillas, analizamos el carácter
-                    Color color = obtenerColorPorCaracter(caracter);
-                    insertarPalabra(String.valueOf(caracter), color, paneAnalisis);
-                }
-            }
-
-            insertarPalabra("\n", Color.BLACK, paneAnalisis);
-        }
-
-        paneAnalisis.setCaretPosition(0);
-
-    }
-
-    // Método que mapea el token a su color
-    private Color obtenerColorPorCaracter(char tipo) {
-        switch (tipo) {
-            case '{':
-            case '}':
-                return new Color(0xF0760E);
-            case '[':
-            case ']':
-                return new Color(0x6B4627);
-            case ':':
-                return new Color(0xFF00FF);
-            case ',':
-                return new Color(0x999999);
-            default:
-                return new Color(0x9E7A7A);
-        }
-    }
-
-    //Metodo que trabaja en conjunto para poder ir pintando letra a letra
-    private void limpiarArea(JTextPane paneAnalisis) throws BadLocationException {
-        StyledDocument doc = paneAnalisis.getStyledDocument();
-        doc.remove(0, doc.getLength());
-
-    }
-
-    // Método para insertar texto con un color específico
-    private void insertarPalabra(String texto, Color color, JTextPane paneAnalisis) throws BadLocationException {
-
-        StyledDocument doc = paneAnalisis.getStyledDocument();
-        // Crear estilo temporal
-        SimpleAttributeSet estilo = new SimpleAttributeSet();
-        StyleConstants.setForeground(estilo, color);
-        // Inserta al final del documento
-        doc.insertString(doc.getLength(), texto, estilo);
-
-    }
-
-    //Metodo que permite reiniciar a los ajustes por defecto el config
-    public void reiniciarPredeterminado(JTextPane paneConfig) throws BadLocationException {
-
-        if (!this.listaTemporal.isEmpty()) {
-            this.listaTemporal.clear();
-        }
-
-        this.palabrasReservadas.clear();
-        this.operadores.clear();
-        this.puntuacion.clear();
-        this.agrupacion.clear();
-
-        for (String reinicio : CONFIG_DEFAULT) {
-            this.listaTemporal.add(reinicio);
-        }
-
-        pintarLogConfig(paneConfig);
-
-    }
-
-    //METODO UNICO QUE PERMITE SETEAR EL ARCHIVO CONFIG PARA ESCRIBIR EN EL LOS NUEVOS CAMBIOS
-    public void guardarCambios() throws ErrorPuntualException {
-
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(CONFIG_PATH))) {
-
-            for (String linea : this.listaTemporal) {
-                bw.write(linea);
-                bw.newLine(); // salto de línea para mantener el formato
-            }
-
-        } catch (IOException ex) {
-            throw new ErrorPuntualException("No se ha podido guardar la configuración en " + CONFIG_PATH);
-        }
-
+    //Verifica que sean numeros de la gramatica definida
+    public boolean estadoNumerico(String numero) {
+        return numero.matches(ER_NUMEROS);
     }
 
     //=====================FIN DEL APARTADO DE METODOS QUE SIRVEN PARA PODER MOSTRAR EN LA UI LA CONFIGURACION====================

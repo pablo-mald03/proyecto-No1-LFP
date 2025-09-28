@@ -39,8 +39,6 @@ public class LectorEntradas {
     //private GenerarReportes generacionReportes;
     public LectorEntradas() {
         this.constantesConfig = new AutomataDeterminista();
-
-        this.constantesConfig.cargarDesdeJson();
         this.lexerActual = new GestorLexer();
         // this.generacionReportes = new GenerarReportes();
     }
