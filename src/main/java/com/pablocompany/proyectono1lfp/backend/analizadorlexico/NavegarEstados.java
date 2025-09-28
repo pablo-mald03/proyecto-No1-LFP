@@ -64,6 +64,7 @@ public class NavegarEstados {
 
         try {
             declararEstadoInicial(this.lexemaAnalisis, this.lexemaAnalisis.getValorNodo(0));
+            this.lexemaAnalisis.setIndiceViajeAFD(0);
 
             //Metodo que permite anunciar el estado que se va a recorrer del lexema
             anunciarLexema(this.lexemaAnalisis);
@@ -106,6 +107,11 @@ public class NavegarEstados {
                             declararEstadoInicial(this.lexemaAnalisis, this.lexemaAnalisis.getValorNodo(indiceError + 1));
                         }
 
+                        if (!this.lexemaAnalisis.getCadenaError().isBlank()) {
+                            //Se registra el error en las transiciones
+                            anunciarError(this.lexemaAnalisis);
+                        }
+
                     } catch (AnalizadorLexicoException ex1) {
                         System.out.println("No se encontro indice sdfsdfds" + ex1.getMessage());
                     }
@@ -115,9 +121,6 @@ public class NavegarEstados {
                 }
 
             }
-
-            //Se anuncia el final del recorrido
-            anunciarFinalRecorrido(this.lexemaAnalisis);
 
         } catch (ErrorPuntualException ex) {
             try {
@@ -143,6 +146,9 @@ public class NavegarEstados {
         if (this.lexemaAnalisis.getValorNodo(0).getToken() == TokenEnum.ERROR) {
             this.lexemaAnalisis.setEstadoAnalisis(TokenEnum.ERROR);
         }
+
+        //Se encarga de anunciar cuando el AFD se reinicia
+        anunciarFinalRecorrido(this.lexemaAnalisis);
 
     }
 
@@ -265,6 +271,40 @@ public class NavegarEstados {
     }
 
     //===========================APARTADO DEL METODO MAS IMPORTANTE DEL ANALIZADOR LEXICO=======================================
+    //Metodo que permite avisar que hubo un erro en el lexema
+    private void anunciarError(Lexema lexemaError) {
+        try {
+            Color colorEstados = new Color(0xB81D00);
+
+            insertarEstadoTransicion("No se ha llegado al estado de aceptacion", colorEstados, this.logTransicionesAFD);
+            insertarEstadoTransicion("\n", Color.BLACK, this.logTransicionesAFD);
+
+            insertarEstadoTransicion("Moviendo al estado de Error con la cadena: ", colorEstados, this.logTransicionesAFD);
+
+            String[] cadenaError = lexemaError.getCadenaError().split("\\s+");
+
+            int indiceError = cadenaError.length - 1;
+
+            if (indiceError < 0) {
+                indiceError = 0;
+            }
+
+            insertarEstadoTransicion(cadenaError[indiceError], new Color(0x292724), this.logTransicionesAFD);
+
+            insertarEstadoTransicion("\n", Color.BLACK, this.logTransicionesAFD);
+
+            insertarEstadoTransicion("Reiniciando Automata...", Color.BLACK, this.logTransicionesAFD);
+
+            insertarEstadoTransicion("\n", Color.BLACK, this.logTransicionesAFD);
+            
+            lexemaError.setIndiceViajeAFD(0);
+
+        } catch (BadLocationException ex) {
+            System.out.println("No se ha podido pintar el log de transiciones");
+        }
+
+    }
+
     //Metodo que anunca el estado que recorrera el AFD
     private void anunciarLexema(Lexema lexemaOperado) {
 
@@ -284,15 +324,21 @@ public class NavegarEstados {
     }
 
     //Metodo que permite ir ilusatrando estado a estado acorde a lo que vaya recorriendo el AFD
-    private void anunciarEstadoRecorrido(Nodo nodoEstado, int indice, String sujeto) {
+    private void anunciarEstadoRecorrido(Lexema lexemaActual, Nodo nodoEstado, String sujeto) {
         try {
             Color colorEstados = new Color(0x0085A6);
 
-            insertarEstadoTransicion("Me movi del estado " + (indice + 1) + " al estado " + (indice + 2) + " con " + sujeto +" ", colorEstados, this.logTransicionesAFD);
+            int indiceTransicion = lexemaActual.getIndiceViajeAFD();
+
+            insertarEstadoTransicion("Me movi del estado " + (indiceTransicion + 1) + " al estado " + (indiceTransicion + 2) + " con " + sujeto + " ", colorEstados, this.logTransicionesAFD);
 
             insertarEstadoTransicion(String.valueOf(nodoEstado.getCaracter()), new Color(0x292724), this.logTransicionesAFD);
 
             insertarEstadoTransicion("\n", Color.BLACK, this.logTransicionesAFD);
+
+            indiceTransicion++;
+
+            lexemaActual.setIndiceViajeAFD(indiceTransicion);
 
         } catch (BadLocationException ex) {
             System.out.println("No se ha podido pintar el log de transiciones");
@@ -304,7 +350,21 @@ public class NavegarEstados {
     private void anunciarFinalRecorrido(Lexema lexemaEvaluado) {
         try {
 
-            insertarEstadoTransicion("Guardando token " + lexemaEvaluado.getEstadoAnalisis().getNombreToken() + ". Lexema: " + lexemaEvaluado.getLexema(), new Color(0x085717), this.logTransicionesAFD);
+            if (!lexemaEvaluado.getCadenaError().isBlank()) {
+
+                TokenEnum tokenEvaluado = lexemaEvaluado.verificarTokenReconocido();
+
+                if (tokenEvaluado != TokenEnum.ERROR) {
+
+                    insertarEstadoTransicion("Guardando token " + tokenEvaluado.getNombreToken() + ". Lexema: " + lexemaEvaluado.getLexema(), new Color(0x085717), this.logTransicionesAFD);
+
+                } else {
+                    insertarEstadoTransicion("Guardando token " + lexemaEvaluado.getEstadoAnalisis().getNombreToken() + ". Lexema: " + lexemaEvaluado.getLexema(), new Color(0x085717), this.logTransicionesAFD);
+                }
+
+            } else {
+                insertarEstadoTransicion("Guardando token " + lexemaEvaluado.getEstadoAnalisis().getNombreToken() + ". Lexema: " + lexemaEvaluado.getLexema(), new Color(0x085717), this.logTransicionesAFD);
+            }
 
             insertarEstadoTransicion("\n", Color.BLACK, this.logTransicionesAFD);
 
@@ -332,7 +392,7 @@ public class NavegarEstados {
         }
 
         //Se anuncia el caracter con el que se mueve de estado el automata
-        anunciarEstadoRecorrido(nodoActual, indice, "un");
+        anunciarEstadoRecorrido(lexemaUtilizado, nodoActual, "un");
 
         nodoActual.setTipo(TokenEnum.PUNTUACION);
 
@@ -349,7 +409,7 @@ public class NavegarEstados {
         }
 
         //Se anuncia el caracter con el que se mueve de estado el automata
-        anunciarEstadoRecorrido(nodoActual, indice, "una");
+        anunciarEstadoRecorrido(lexemaUtilizado, nodoActual, "una");
 
         nodoActual.setTipo(TokenEnum.AGRUPACION);
 
@@ -366,7 +426,7 @@ public class NavegarEstados {
         }
 
         //Se anuncia el caracter con el que se mueve de estado el automata
-        anunciarEstadoRecorrido(nodoActual, indice, "un");
+        anunciarEstadoRecorrido(lexemaUtilizado, nodoActual, "un");
 
         nodoActual.setTipo(TokenEnum.OPERADOR);
 
@@ -389,7 +449,7 @@ public class NavegarEstados {
         }
 
         //Se anuncia el caracter con el que se mueve de estado el automata
-        anunciarEstadoRecorrido(nodoActual, indice, "una");
+        anunciarEstadoRecorrido(lexemaUtilizado, nodoActual, "una");
 
         nodoActual.setTipo(TokenEnum.IDENTIFICADOR);
 
@@ -435,7 +495,7 @@ public class NavegarEstados {
         }
 
         //Se anuncia el caracter con el que se mueve de estado el automata
-        anunciarEstadoRecorrido(nodoActual, indice, "un");
+        anunciarEstadoRecorrido(lexemaUtilizado, nodoActual, "un");
 
         nodoActual.setTipo(TokenEnum.NUMERO);
 
@@ -480,7 +540,7 @@ public class NavegarEstados {
         }
 
         //Se anuncia el caracter con el que se mueve de estado el automata
-        anunciarEstadoRecorrido(nodoActual, indice, "un");
+        anunciarEstadoRecorrido(lexemaUtilizado, nodoActual, "un");
 
         nodoActual.setTipo(TokenEnum.DECIMAL);
     }
@@ -504,7 +564,7 @@ public class NavegarEstados {
         }
 
         //Se anuncia el caracter con el que se mueve de estado el automata
-        anunciarEstadoRecorrido(nodoActual, indice, "una");
+        anunciarEstadoRecorrido(lexemaUtilizado, nodoActual, "una");
 
         nodoActual.setTipo(TokenEnum.CADENA);
     }

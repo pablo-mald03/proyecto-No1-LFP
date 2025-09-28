@@ -38,6 +38,9 @@ public class Lexema {
     //Indica el lexema que causo el error
     private String lexemaError;
 
+    //Indice que indica hasta donde llega el automata en su viaje de estados y permite reiniciarlo
+    private int indiceViajeAFD;
+
     //ATRIBUTO QUE AYUDA A VALIDAR SI YA EL LEXAMA FUE COMPLETAMENTE PROCESADO
     //True si ya
     //False si solo ha sido cambiado de estado pero aun no confirmado
@@ -50,6 +53,17 @@ public class Lexema {
         this.estadoAnalisis = TokenEnum.INDEFINIDO;
         this.yaDeclarado = false;
         this.lexemaError = "";
+        this.indiceViajeAFD = 0;
+    }
+
+    //Metodo que sirve para poder saber de que estado transicionara
+    public int getIndiceViajeAFD() {
+        return indiceViajeAFD;
+    }
+
+    //Metodo que sirve para ir configurando el siguiente estado
+    public void setIndiceViajeAFD(int indiceViajeAFD) {
+        this.indiceViajeAFD = indiceViajeAFD;
     }
 
     //METODOS QUE PERMITEN SABER EN QUE POSICION DE LA SENTENCIA SE UBICA EL LEXEMA
@@ -168,6 +182,26 @@ public class Lexema {
 
         throw new AnalizadorLexicoException("No se ha encontrado el indice del nodo");
 
+    }
+
+    //Metodo que sirve para saber si en el arreglo hay algun nodo con token
+    public TokenEnum verificarTokenReconocido() {
+
+        for (int i = 0; i < this.getLongitudNodo(); i++) {
+
+            if (this.estadoAnalisis != TokenEnum.ERROR) {
+                break;
+            }
+
+            Nodo nodoEvaluado = this.listaNodos.get(i);
+
+            if (nodoEvaluado.getToken() != TokenEnum.ERROR) {
+                return nodoEvaluado.getToken();
+            }
+
+        }
+
+        return this.estadoAnalisis;
     }
 
 }
