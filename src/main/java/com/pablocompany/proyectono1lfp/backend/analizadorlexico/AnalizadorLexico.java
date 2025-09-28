@@ -164,6 +164,8 @@ public class AnalizadorLexico {
     //Metodo principal y unico para analizar cada lexema moviendose entre estados
     public void recorrerAnalisis() throws BadLocationException {
 
+        this.logTransiciones.setText("");
+
         for (int i = 0; i < this.listaSentencias.size(); i++) {
 
             Sentencia sentenciaActiva = this.listaSentencias.get(i);
@@ -200,6 +202,7 @@ public class AnalizadorLexico {
         if (this.automataFinitoDeterminista.estadoPalabrasReservadas(lexemaActual.getLexema())) {
             lexemaActual.generalizarNodo(TokenEnum.PALABRA_RESERVADA);
             lexemaActual.setYaDeclarado(true);
+            ilustrarEstadosAutomata(lexemaActual);
             return true;
         }
 
@@ -207,6 +210,7 @@ public class AnalizadorLexico {
         if (lexemaActual.getLongitudNodo() == 1 && this.automataFinitoDeterminista.estadoOperadoresMatematicos(lexemaActual.getLexema().charAt(0))) {
             lexemaActual.generalizarNodo(TokenEnum.OPERADOR);
             lexemaActual.setYaDeclarado(true);
+            ilustrarEstadosAutomata(lexemaActual);
             return true;
         }
 
@@ -214,6 +218,7 @@ public class AnalizadorLexico {
         if (lexemaActual.getLongitudNodo() == 1 && this.automataFinitoDeterminista.estadoAgrupacion(lexemaActual.getLexema().charAt(0))) {
             lexemaActual.generalizarNodo(TokenEnum.AGRUPACION);
             lexemaActual.setYaDeclarado(true);
+            ilustrarEstadosAutomata(lexemaActual);
             return true;
         }
 
@@ -221,6 +226,7 @@ public class AnalizadorLexico {
         if (lexemaActual.getLongitudNodo() == 1 && this.automataFinitoDeterminista.estadoPuntuacion(String.valueOf(lexemaActual.getLexema().charAt(0)))) {
             lexemaActual.generalizarNodo(TokenEnum.PUNTUACION);
             lexemaActual.setYaDeclarado(true);
+            ilustrarEstadosAutomata(lexemaActual);
             return true;
         }
 
@@ -376,6 +382,45 @@ public class AnalizadorLexico {
                 posicion.setLexemaError(lexemaActual.getLexema() + "... Comentario de bloque sin cierre. Fila " + posicion.getFilaCoordenada());
             }
 
+        }
+
+    }
+
+    //METODO MAS IMPORTANTE PARA PODER GENERAR LAS NAVEGACIONES ENTRE ESTADOS DEL AUTOMATA
+    public void ilustrarEstadosAutomata(Lexema lexemaEvaluado) {
+
+        try {
+            Color colorTexto = obtenerColorPorToken(lexemaEvaluado.getEstadoAnalisis());
+
+            insertarToken("Con " + lexemaEvaluado.getEstadoAnalisis().getContexto() + ": " + lexemaEvaluado.getLexema(), colorTexto, this.logTransiciones);
+
+            insertarToken("\n", Color.BLACK, this.logTransiciones);
+
+            Color colorEstados = new Color(0x0085A6);
+
+            for (int i = 0; i < lexemaEvaluado.obtenerListaNodo().size(); i++) {
+
+                Nodo nodoEvaluado = lexemaEvaluado.getValorNodo(i);
+
+                insertarToken("Me movi del estado " + (i + 1) + " al estado " + (i + 2) + " con una ", colorEstados, this.logTransiciones);
+
+                insertarToken(String.valueOf(nodoEvaluado.getCaracter()), new Color(0x292724), this.logTransiciones);
+
+                insertarToken("\n", Color.BLACK, this.logTransiciones);
+
+            }
+
+            insertarToken("Guardando token"+" Lexema: " + lexemaEvaluado.getLexema(), new Color(0x085717), this.logTransiciones);
+
+            insertarToken("\n", Color.BLACK, this.logTransiciones);
+
+            insertarToken("Reiniciando Automata...", Color.BLACK, this.logTransiciones);
+
+            insertarToken("\n", Color.BLACK, this.logTransiciones);
+            insertarToken("\n", Color.BLACK, this.logTransiciones);
+
+        } catch (BadLocationException ex) {
+            System.out.println("No se ha podido pintar el log de transiciones");
         }
 
     }

@@ -10,26 +10,35 @@ package com.pablocompany.proyectono1lfp.backend.analizadorlexico;
  */
 public enum TokenEnum {
     
-    INDEFINIDO("INDEFINIDO"),
-    IDENTIFICADOR("IDENTIFICADOR"),
-    NUMERO("NUMERO"),
-    DECIMAL("DECIMAL"),
-    CADENA("CADENA"),
-    PALABRA_RESERVADA("PALABRA_RESERVADA"),
-    PUNTUACION("PUNTUACION"),
-    OPERADOR("OPERADOR"),
-    AGRUPACION("AGRUPACION"),
-    COMENTARIO_LINEA("COMENTARIO_LINEA"),
-    COMENTARIO_BLOQUE("COMENTARIO_BLOQUE"),
-    ERROR("ERROR");
+    INDEFINIDO("INDEFINIDO","la indeterminacion"),
+    IDENTIFICADOR("IDENTIFICADOR","el identificador"),
+    NUMERO("NUMERO","el numero"),
+    DECIMAL("DECIMAL","el decimal"),
+    CADENA("CADENA","la cadena de texto"),
+    PALABRA_RESERVADA("PALABRA_RESERVADA","la palabra reservada"),
+    PUNTUACION("PUNTUACION","el signo puntuacion"),
+    OPERADOR("OPERADOR","el operador"),
+    AGRUPACION("AGRUPACION","el signo de agrupacion"),
+    COMENTARIO_LINEA("COMENTARIO_LINEA","el comentario de linea"),
+    COMENTARIO_BLOQUE("COMENTARIO_BLOQUE","el comentario de bloque"),
+    ERROR("ERROR","el error");
 
+    //Representa el tipo de token
     private String tipo;
+    
+    //Atributo que representa el contexto del token
+    private String contexto;
 
-    private TokenEnum(String valor) {
+    private TokenEnum(String valor, String contextoDado) {
         this.tipo = valor;
+        this.contexto = contextoDado;
     }
 
     public String getTipo() {
         return this.tipo;
+    }
+    
+    public String getContexto() {
+        return this.contexto;
     }
 }
