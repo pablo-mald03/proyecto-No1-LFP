@@ -22,6 +22,9 @@ public class Lexema {
 
     //Representa la linea en la que se encuetra situado el lexema
     private int lineaCoordenada;
+    
+    //Atributo que permite saber en que posicion del arreglo esta posicionado el lexema
+    private int posicionLexema; 
 
     //AYUDA A DECLARAR EL ESTADO INICIAL AL QUE SERA SOMETIDO EN BASE A LA DETECCION DE PATRON
     private TokenEnum estadoAnalisis;
@@ -44,6 +47,16 @@ public class Lexema {
         this.estadoAnalisis = TokenEnum.INDEFINIDO;
         this.yaDeclarado = false;
         this.lexemaError = "";
+    }
+
+    
+    //METODOS QUE PERMITEN SABER EN QUE POSICION DE LA SENTENCIA SE UBICA EL LEXEMA
+    public int getPosicionLexema() {
+        return posicionLexema;
+    }
+
+    public void setPosicionLexema(int posicionLexema) {
+        this.posicionLexema = posicionLexema;
     }
 
     //Retorna el lexema por si se necesita 
@@ -114,7 +127,7 @@ public class Lexema {
 
     //Metodo encargado para ir clasificando los estados y tipos de todas las letras que componen el lexema
     public int separarNodos(String palabra, int columna, int fila) {
-
+        
         int columnaNodo = columna;
 
         for (int i = 0; i < palabra.length(); i++) {

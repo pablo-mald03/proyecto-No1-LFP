@@ -4,7 +4,6 @@
  */
 package com.pablocompany.proyectono1lfp.backend.analizadorlexico;
 
-import com.pablocompany.proyectono1lfp.backend.excepciones.ConfigException;
 import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorEncontradoException;
 import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorPuntualException;
 import java.awt.Color;
@@ -27,7 +26,17 @@ import javax.swing.text.StyledDocument;
  *
  * @author pablo
  */
-public class ConfigDatos {
+//Clase remasterizada que brinda todas las expresiones regulares
+//BRINDA MODULARIDAD PARA PODER MODIFICAR EL AUTOMATA
+public class AutomataDeterminista {
+    
+    
+    //APARTADO DE EXPRESIONES REGULARES QUE PERMITEN VALIDAR LOS ESTADOS DEL AUTOMATA FINITO DETERMINISTA
+    private final String ER_COMENTARIO = "^//$";
+    private final String ER_COMENTARIO_MULTI_INICIO = "^/*$";
+    private final String ER_COMENTARIO_MULTI_FIN = "^*/$";
+    
+    
     
      //DIRECTORIO PRINCIPAL
     private final String CONFIG_PATH = "configuracion/config.json";
@@ -64,7 +73,7 @@ public class ConfigDatos {
     //Lista temporal que permite mostrar en pantalla el config
     private ArrayList<String> listaTemporal = new ArrayList<>(5000);
 
-    public ConfigDatos() {
+    public AutomataDeterminista() {
         this.comments = new Comentarios();
     }
 
@@ -89,18 +98,18 @@ public class ConfigDatos {
     }
 
     //Verifica que sea comentario de una sola linea
-    public boolean esComentarioLinea(String entrada) {
-        return entrada.equals(this.comments.getComentarioLinea());
+    public boolean estadoComentarioLinea(String entrada) {
+        return entrada.matches(ER_COMENTARIO);
     }
 
     //Metodos de verificacion que permiten Analizarr el comentario fin
-    public boolean esBloqueComentarioInicial(String inicio) {
-        return inicio.equals(this.comments.getBloqueInicio());
+    public boolean estadoBloqueComentarioInicial(String inicio) {
+        return inicio.matches(ER_COMENTARIO_MULTI_INICIO);
     }
 
     //Verifica que sea comentario multilinea
-    public boolean esBloqueComentarioFin(String fin) {
-        return fin.equalsIgnoreCase(this.comments.getBloqueFin());
+    public boolean estadoBloqueComentarioFin(String fin) {
+        return fin.matches(ER_COMENTARIO_MULTI_FIN);
     }
 
     // Método para inicializar archivo config.json si no existe

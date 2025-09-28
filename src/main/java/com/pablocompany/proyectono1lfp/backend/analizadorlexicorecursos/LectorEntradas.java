@@ -5,7 +5,7 @@
 package com.pablocompany.proyectono1lfp.backend.analizadorlexicorecursos;
 
 import com.pablocompany.proyectono1lfp.backend.analizadorlexico.AnalizadorLexico;
-import com.pablocompany.proyectono1lfp.backend.analizadorlexico.ConfigDatos;
+import com.pablocompany.proyectono1lfp.backend.analizadorlexico.AutomataDeterminista;
 import com.pablocompany.proyectono1lfp.backend.analizadorlexico.GestorLexer;
 import com.pablocompany.proyectono1lfp.backend.excepciones.AnalizadorLexicoException;
 import com.pablocompany.proyectono1lfp.backend.excepciones.ConfigException;
@@ -34,11 +34,11 @@ public class LectorEntradas {
     private GestorLexer lexerActual;
 
     //------------------Subregion de gramatica extraidas del config.json----------------------------
-    private ConfigDatos constantesConfig;
+    private AutomataDeterminista constantesConfig;
 
     //private GenerarReportes generacionReportes;
     public LectorEntradas() {
-        this.constantesConfig = new ConfigDatos();
+        this.constantesConfig = new AutomataDeterminista();
 
         this.constantesConfig.cargarDesdeJson();
         this.lexerActual = new GestorLexer();
@@ -109,7 +109,7 @@ public class LectorEntradas {
     }
 
     //Metodo que retorna la referencia de config
-    public ConfigDatos getDatosConfig() {
+    public AutomataDeterminista getDatosConfig() {
         return this.constantesConfig;
     }
 

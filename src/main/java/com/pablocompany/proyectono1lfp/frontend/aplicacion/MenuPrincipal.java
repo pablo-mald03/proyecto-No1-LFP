@@ -766,7 +766,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         try {
             //Detecta cada vez que se cambia una palabra
-            String textoEntradaEdit = this.textEdicionArchivo.getText().replace("\t", "    ");
+            String textoEntradaEdit = this.textEdicionArchivo.getText().replace("\t", "      ");
 
             this.leerEntradas.transformarTexto(textoEntradaEdit, this.textEdicionArchivo);
 
@@ -984,7 +984,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
                 textEdicionArchivo.getDocument().insertString(
                         textEdicionArchivo.getCaretPosition(),
-                        "    ",
+                        "      ",
                         null
                 );
                 evt.consume();

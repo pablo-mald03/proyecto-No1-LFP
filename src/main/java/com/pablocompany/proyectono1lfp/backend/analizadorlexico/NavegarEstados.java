@@ -26,13 +26,13 @@ public class NavegarEstados {
     private final String ABECEDARIO = "abcdefghijklmnopqrstuvwxyz";
     private final String DIGITOS = "0123456789";
     //Permite tener la referencia a los datos del json
-    private ConfigDatos constantesConfig;
+    private AutomataDeterminista constantesConfig;
 
     //Atributo que sirve para exponer los errores
     private JTextPane logErrores;
 
     //==============================FIN DE LA REGION DE APARTADOS DE CONSTANTES GRAMATICA======================================
-    public NavegarEstados(ConfigDatos constantesConfig, JTextPane logErrores) {
+    public NavegarEstados(AutomataDeterminista constantesConfig, JTextPane logErrores) {
         this.constantesConfig = constantesConfig;
         this.logErrores = logErrores;
     }
@@ -50,7 +50,7 @@ public class NavegarEstados {
     }
 
     //Metodo que ayuda a tener permanentemente al tanto la referencia del config
-    public void setConstantesConfig(ConfigDatos constantesConfig) {
+    public void setConstantesConfig(AutomataDeterminista constantesConfig) {
         this.constantesConfig = constantesConfig;
         if (this.lexemaAnalisis != null) {
             this.lexemaAnalisis = null;

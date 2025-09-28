@@ -26,7 +26,7 @@ public class AnalizadorLexico {
 
     //==============================REGION DE APARTADOS DE CONSTANTES GRAMATICA======================================
     //Permite tener la referencia a los datos del json
-    private ConfigDatos constantesConfig;
+    private AutomataDeterminista automataFinitoDeterminista;
 
     //==============================FIN DE LA REGION DE APARTADOS DE CONSTANTES GRAMATICA======================================
     //Estructura dinamica encargada de almacenar por completo caracter a caracter
@@ -45,18 +45,18 @@ public class AnalizadorLexico {
     //Se conserva una lista para poder dar el paso al analisis de datos (SOLO ES PROVISIONAL)
     private ArrayList<String> listaEntrada = new ArrayList<>(6000);
 
-    public AnalizadorLexico(JTextPane areaAnalisis, ArrayList<String> listaExtraida, JTextPane paneErrores, JTextPane logAreaTransicion, ConfigDatos configuracion) throws ConfigException {
+    public AnalizadorLexico(JTextPane areaAnalisis, ArrayList<String> listaExtraida, JTextPane paneErrores, JTextPane logAreaTransicion, AutomataDeterminista configuracion) throws ConfigException {
         this.areaAnalisis = areaAnalisis;
 
         this.listaEntrada = listaExtraida;
 
-        this.constantesConfig = configuracion;
+        automataFinitoDeterminista = configuracion;
 
         this.logErrores = paneErrores;
 
         this.logTransiciones = logAreaTransicion;
 
-        this.analizarEstados = new NavegarEstados(this.constantesConfig, paneErrores);
+        this.analizarEstados = new NavegarEstados(automataFinitoDeterminista, paneErrores);
 
     }
 
@@ -82,7 +82,7 @@ public class AnalizadorLexico {
 
             ArrayList<Lexema> lexemaSeparado = new ArrayList<>(5000);
 
-            if (filaTexto.isBlank()) {
+            if (filaTexto == null || filaTexto.isEmpty()) {
                 lexemaSeparado.add(new Lexema("", linea));
                 this.listaSentencias.add(new Sentencia(lexemaSeparado, linea));
                 continue;
@@ -100,7 +100,7 @@ public class AnalizadorLexico {
 
                 } else if (caracter == '\t' && !entreComillas) {
 
-                    lexemaSeparado.add(new Lexema("    ", linea));
+                    lexemaSeparado.add(new Lexema("      ", linea));
 
                 } else if (Character.isWhitespace(caracter) && !entreComillas) {
 
@@ -139,11 +139,13 @@ public class AnalizadorLexico {
 
                 Lexema lexemaDado = sentenciaActiva.getListaLexema(j);
 
+                lexemaDado.setPosicionLexema(j);
+
                 int fila = lexemaDado.getFilaCoordenada();
 
                 String palabra = lexemaDado.getLexema();
 
-                if (palabra.isBlank()) {
+                if (palabra == null || palabra.isEmpty()) {
                     continue;
                 }
 
@@ -170,23 +172,16 @@ public class AnalizadorLexico {
 
                 Lexema lexemaDado = sentenciaActiva.getListaLexema(j);
 
-                String palabra = lexemaDado.getLexema();
-
-                //Evita todas las lineas en blanco que existan
-                if (palabra.isBlank()) {
-                    continue;
-                }
-
                 if (!lexemaDado.esYaDeclarado()) {
 
                     //Metodo que busca generalizar o hacer match lo mas rapido posible con un token del json
                     //Aprovecha para declarar comentarios y permitir seguir analizando los estados
-                    if (buscarGeneralizaciones(lexemaDado, sentenciaActiva, this.listaSentencias, (sentenciaActiva.getFilaSentencia() - 1))) {
+                    if (buscarGeneralizacionesAFD(lexemaDado, sentenciaActiva, this.listaSentencias, (sentenciaActiva.getFilaSentencia() - 1))) {
                         continue;
                     }
 
                     //Continua viajando entre estados si no es un token que se puede generalizar
-                    this.analizarEstados.setConstantesConfig(this.constantesConfig);
+                    this.analizarEstados.setConstantesConfig(this.automataFinitoDeterminista);
                     this.analizarEstados.iniciarViajeEstados(lexemaDado);
 
                 }
@@ -199,60 +194,77 @@ public class AnalizadorLexico {
     }
 
     //Metodo que sirve cuando la cadena se compone de cierta forma que el token esta escrito literal como en el .json
-    public boolean buscarGeneralizaciones(Lexema lexemaActual, Sentencia lineaPosicionada, ArrayList<Sentencia> listaSentencias, int iterador) {
+    public boolean buscarGeneralizacionesAFD(Lexema lexemaActual, Sentencia lineaPosicionada, ArrayList<Sentencia> listaSentencias, int iterador) {
 
         //Detecta si es palabra reservada directamente
-        if (this.constantesConfig.esPalabrasReservadas(lexemaActual.getLexema())) {
+        if (this.automataFinitoDeterminista.esPalabrasReservadas(lexemaActual.getLexema())) {
             lexemaActual.generalizarNodo(TokenEnum.PALABRA_RESERVADA);
             lexemaActual.setYaDeclarado(true);
             return true;
         }
 
         //Detecta si es operador directamente
-        if (lexemaActual.getLongitudNodo() == 1 && this.constantesConfig.esOperadores(lexemaActual.getLexema().charAt(0))) {
+        if (lexemaActual.getLongitudNodo() == 1 && this.automataFinitoDeterminista.esOperadores(lexemaActual.getLexema().charAt(0))) {
             lexemaActual.generalizarNodo(TokenEnum.OPERADOR);
             lexemaActual.setYaDeclarado(true);
             return true;
         }
 
         //Detecta si es signo de agrupacion directamente
-        if (lexemaActual.getLongitudNodo() == 1 && this.constantesConfig.esAgrupacion(lexemaActual.getLexema().charAt(0))) {
+        if (lexemaActual.getLongitudNodo() == 1 && this.automataFinitoDeterminista.esAgrupacion(lexemaActual.getLexema().charAt(0))) {
             lexemaActual.generalizarNodo(TokenEnum.AGRUPACION);
             lexemaActual.setYaDeclarado(true);
             return true;
         }
 
         //Detecta si es signo de puntuacion directamente
-        if (lexemaActual.getLongitudNodo() == 1 && this.constantesConfig.esPuntuacion(lexemaActual.getLexema().charAt(0))) {
+        if (lexemaActual.getLongitudNodo() == 1 && this.automataFinitoDeterminista.esPuntuacion(lexemaActual.getLexema().charAt(0))) {
             lexemaActual.generalizarNodo(TokenEnum.PUNTUACION);
             lexemaActual.setYaDeclarado(true);
             return true;
         }
 
+        //Detecta si existe un comentario de linea en cualquier linea o posicion que se encuentre 
         if (lexemaActual.getLongitudNodo() > 1) {
-
             //Detecta si es comentario directamente DE UNA LINEA
             String lexemaInicial = String.valueOf(lexemaActual.getValorNodo(0).getCaracter()) + String.valueOf(lexemaActual.getValorNodo(1).getCaracter());
 
-            if (this.constantesConfig.esComentarioLinea(lexemaInicial)) {
+            if (this.automataFinitoDeterminista.estadoComentarioLinea(lexemaInicial)) {
 
-                for (Lexema posicion : lineaPosicionada.obtenerListadoLexemas()) {
+                int filaUbicacionLexema = lexemaActual.getPosicionLexema();
 
-                    posicion.generalizarNodo(TokenEnum.COMENTARIO_LINEA);
-                    posicion.setYaDeclarado(true);
+                ArrayList<Lexema> listadoSentenciaLexemaComentario = lineaPosicionada.obtenerListadoLexemas();
+
+                for (int k = filaUbicacionLexema; k < listadoSentenciaLexemaComentario.size(); k++) {
+
+                    Lexema lexemaUbicadoComentado = listadoSentenciaLexemaComentario.get(k);
+                    lexemaUbicadoComentado.generalizarNodo(TokenEnum.COMENTARIO_LINEA);
+                    lexemaUbicadoComentado.setYaDeclarado(true);
                 }
 
                 return true;
             }
 
             if (lexemaActual.getValorNodo(0).getCaracter() == '/' && lexemaActual.getValorNodo(1).getCaracter() != '/' && lexemaActual.getValorNodo(1).getCaracter() != '*') {
-                lexemaActual.generalizarNodo(TokenEnum.ERROR);
-                lexemaActual.setYaDeclarado(true);
-                lexemaActual.setLexemaError(lexemaActual.getLexema() + " Formato no apropiado de comentario. NO TOKEN");
+
+                int filaUbicacionLexema = lexemaActual.getPosicionLexema();
+
+                ArrayList<Lexema> listadoSentenciaLexemaComentario = lineaPosicionada.obtenerListadoLexemas();
+
+                for (int k = filaUbicacionLexema; k < listadoSentenciaLexemaComentario.size(); k++) {
+
+                    Lexema lexemaUbicadoComentado = listadoSentenciaLexemaComentario.get(k);
+
+                    lexemaUbicadoComentado.generalizarNodo(TokenEnum.ERROR);
+                    lexemaUbicadoComentado.setYaDeclarado(true);
+                    lexemaUbicadoComentado.setLexemaError(lexemaActual.getLexema() + " Formato no apropiado de comentario. NO TOKEN");
+                }
+
                 return true;
             }
 
         }
+        
 
         //Busca la generalidad de poder generar un comentario multilinea
         if (lexemaActual.getLongitudNodo() > 1) {
@@ -260,7 +272,7 @@ public class AnalizadorLexico {
             //Detecta si es comentario directamente DE UNA LINEA
             String cadenaLexema = String.valueOf(lexemaActual.getValorNodo(0).getCaracter()) + String.valueOf(lexemaActual.getValorNodo(1).getCaracter());
 
-            if (this.constantesConfig.esBloqueComentarioInicial(cadenaLexema)) {
+            if (this.automataFinitoDeterminista.estadoBloqueComentarioInicial(cadenaLexema)) {
 
                 lexemaActual.generalizarNodo(TokenEnum.COMENTARIO_BLOQUE);
                 lexemaActual.setYaDeclarado(true);
@@ -282,7 +294,7 @@ public class AnalizadorLexico {
 
                             String lineaCierre = String.valueOf(posicion.getValorNodo(indice - 1).getCaracter()) + String.valueOf(posicion.getValorNodo(indice).getCaracter());
 
-                            if (this.constantesConfig.esBloqueComentarioFin(lineaCierre)) {
+                            if (this.automataFinitoDeterminista.estadoBloqueComentarioFin(lineaCierre)) {
                                 finHallado = true;
 
                                 break;

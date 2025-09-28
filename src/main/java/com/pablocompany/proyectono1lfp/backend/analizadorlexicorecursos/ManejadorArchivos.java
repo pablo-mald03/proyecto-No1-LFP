@@ -89,9 +89,9 @@ public class ManejadorArchivos {
         try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
             String linea;
             while ((linea = br.readLine()) != null) {
-                linea = linea.trim();
-
-                listaLectura.add(linea); // guardamos la línea tal cual
+                //permite remasterizar todas las tabulaciones
+                linea = linea.replace("\t", "      "); 
+                listaLectura.add(linea); 
 
             }
         } catch (IOException ex) {
