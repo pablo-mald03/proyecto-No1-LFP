@@ -11,34 +11,33 @@ import java.util.ArrayList;
  * @author pablo
  */
 public class Sentencia {
-    
-    private ArrayList<Lexema> listaLexemas;
-    private int filaSentencia; 
 
-    public Sentencia(ArrayList<Lexema> listaLexema,int fila ) {
+    private ArrayList<Lexema> listaLexemas;
+    private int filaSentencia;
+
+    public Sentencia(ArrayList<Lexema> listaLexema, int fila) {
         this.listaLexemas = listaLexema;
         this.filaSentencia = fila;
-        
+
     }
-     
+
     //Metodo que retorna la linea en la que se encuentra la sentencia
-    public int getFilaSentencia(){
+    public int getFilaSentencia() {
         return this.filaSentencia;
     }
-    
+
     //Metodo que permite acceder al lexema almacenado en la lista
-    public Lexema getListaLexema(int indice){
+    public Lexema getListaLexema(int indice) {
         return this.listaLexemas.get(indice);
     }
-    
+
     //Metodo que retorna el limite de los lexemas almacenados
-    public int limiteLexemas(){
+    public int limiteLexemas() {
         return this.listaLexemas.size();
     }
-    
-    public ArrayList<Lexema> obtenerListadoLexemas(){
+
+    public ArrayList<Lexema> obtenerListadoLexemas() {
         return this.listaLexemas;
     }
-    
-    
+
 }

@@ -29,16 +29,13 @@ import javax.swing.text.StyledDocument;
 //Clase remasterizada que brinda todas las expresiones regulares
 //BRINDA MODULARIDAD PARA PODER MODIFICAR EL AUTOMATA
 public class AutomataDeterminista {
-    
-    
+
     //APARTADO DE EXPRESIONES REGULARES QUE PERMITEN VALIDAR LOS ESTADOS DEL AUTOMATA FINITO DETERMINISTA
     private final String ER_COMENTARIO = "^//$";
-    private final String ER_COMENTARIO_MULTI_INICIO = "^/*$";
-    private final String ER_COMENTARIO_MULTI_FIN = "^*/$";
-    
-    
-    
-     //DIRECTORIO PRINCIPAL
+    private final String ER_COMENTARIO_MULTI_INICIO = "^/\\*$";  
+    private final String ER_COMENTARIO_MULTI_FIN = "^\\*/$";
+
+    //DIRECTORIO PRINCIPAL
     private final String CONFIG_PATH = "configuracion/config.json";
 
     private ArrayList<String> palabrasReservadas = new ArrayList<>();
@@ -168,9 +165,8 @@ public class AutomataDeterminista {
             cargarComentarios(json);
 
         } catch (IOException ex) {
-            
+
             //PENDIENTE
-            
             System.out.println("Pendiente de tratar");
         }
 
@@ -266,7 +262,7 @@ public class AutomataDeterminista {
             this.listaTemporal.clear();
         }
 
-       initConfig();
+        initConfig();
 
         try (BufferedReader br = new BufferedReader(new FileReader(CONFIG_PATH))) {
             String linea;
@@ -519,5 +515,4 @@ public class AutomataDeterminista {
     }
 
     //=====================FIN DEL APARTADO DE METODOS QUE SIRVEN PARA PODER MOSTRAR EN LA UI LA CONFIGURACION====================
-    
 }

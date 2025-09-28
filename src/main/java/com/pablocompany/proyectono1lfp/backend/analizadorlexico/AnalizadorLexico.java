@@ -264,9 +264,8 @@ public class AnalizadorLexico {
             }
 
         }
-        
 
-        //Busca la generalidad de poder generar un comentario multilinea
+        //Busca la generalidad de poder generar un comentario multilinea 
         if (lexemaActual.getLongitudNodo() > 1) {
 
             //Detecta si es comentario directamente DE UNA LINEA
@@ -279,7 +278,37 @@ public class AnalizadorLexico {
 
                 boolean finHallado = false;
 
-                for (int i = iterador; i < listaSentencias.size(); i++) {
+                int filaLexemaBloque = lexemaActual.getPosicionLexema();
+
+                ArrayList<Lexema> listadoSentenciaLexemaBloque = lineaPosicionada.obtenerListadoLexemas();
+
+                for (int k = filaLexemaBloque; k < listadoSentenciaLexemaBloque.size(); k++) {
+
+                    Lexema lexemaUbicadoComentado = listadoSentenciaLexemaBloque.get(k);
+                    lexemaUbicadoComentado.generalizarNodo(TokenEnum.COMENTARIO_BLOQUE);
+                    lexemaUbicadoComentado.setYaDeclarado(true);
+
+                    int indice = lexemaUbicadoComentado.getLongitudNodo() - 1;
+
+                    if (lexemaUbicadoComentado.getLongitudNodo() > 1) {
+
+                        String lineaCierre = String.valueOf(lexemaUbicadoComentado.getValorNodo(indice - 1).getCaracter()) + String.valueOf(lexemaUbicadoComentado.getValorNodo(indice).getCaracter());
+
+                        if (this.automataFinitoDeterminista.estadoBloqueComentarioFin(lineaCierre)) {
+                            finHallado = true;
+                            break;
+
+                        }
+                    }
+
+                }
+
+                //Ciclo que permite recorrer las lineas consecuentes al comentario multilinea 
+                for (int i = iterador + 1; i < listaSentencias.size(); i++) {
+
+                    if (finHallado) {
+                        break;
+                    }
 
                     Sentencia sentenciaIndex = listaSentencias.get(i);
 
@@ -296,7 +325,6 @@ public class AnalizadorLexico {
 
                             if (this.automataFinitoDeterminista.estadoBloqueComentarioFin(lineaCierre)) {
                                 finHallado = true;
-
                                 break;
 
                             }
@@ -307,7 +335,11 @@ public class AnalizadorLexico {
                     if (finHallado) {
                         break;
                     }
+                }
 
+                //Condicion que declara el error si en dado caso el comentario de bloque no tiene cierre
+                if (!finHallado) {
+                    declararComentarioBloque(lexemaActual, lineaPosicionada, listaSentencias, iterador);
                 }
 
                 return true;
@@ -318,6 +350,36 @@ public class AnalizadorLexico {
         return false;
     }
 
+    //SUBMETODO que permite declarar que el comentario de bloque NO TIENE CIERRE
+    private void declararComentarioBloque(Lexema lexemaActual, Sentencia lineaPosicionada, ArrayList<Sentencia> listaSentencias, int iterador) {
+
+        int filaLexemaBloque = lexemaActual.getPosicionLexema();
+
+        ArrayList<Lexema> listadoSentenciaLexemaBloque = lineaPosicionada.obtenerListadoLexemas();
+
+        for (int k = filaLexemaBloque; k < listadoSentenciaLexemaBloque.size(); k++) {
+
+            Lexema comentarioBloqueUbicado = listadoSentenciaLexemaBloque.get(k);
+            comentarioBloqueUbicado.generalizarNodo(TokenEnum.ERROR);
+            comentarioBloqueUbicado.setYaDeclarado(true);
+
+            comentarioBloqueUbicado.setLexemaError(lexemaActual.getLexema() + "... Comentario de bloque sin cierre. Fila " + comentarioBloqueUbicado.getFilaCoordenada());
+        }
+
+        for (int i = iterador + 1; i < listaSentencias.size(); i++) {
+
+            Sentencia sentenciaIndex = listaSentencias.get(i);
+
+            for (Lexema posicion : sentenciaIndex.obtenerListadoLexemas()) {
+                posicion.generalizarNodo(TokenEnum.ERROR);
+                posicion.setYaDeclarado(true);
+                posicion.setLexemaError(lexemaActual.getLexema() + "... Comentario de bloque sin cierre. Fila " + posicion.getFilaCoordenada());
+            }
+
+        }
+
+    }
+
     //============================FIN DE LA REGION QUE PERMITE EL ANALISIS DE CADA LEXEMA CON SUS RESPECTIVOS NODOS===========================
     //METODO UNICO QUE SIRVE PARA COLOREAR LOS LOG DE SALIDA
     public void pintarLogSalida(JTextPane paneAnalisis, boolean enAnalisis) throws BadLocationException {
@@ -325,7 +387,7 @@ public class AnalizadorLexico {
         int caretOffset = paneAnalisis.getCaretPosition();
         StyledDocument doc = paneAnalisis.getStyledDocument();
 
-// Línea y columna reales antes de limpiar
+        // Línea y columna reales antes de limpiar
         int lineaCaret = doc.getDefaultRootElement().getElementIndex(caretOffset);
         int columnaCaret = caretOffset - doc.getDefaultRootElement()
                 .getElement(lineaCaret)
