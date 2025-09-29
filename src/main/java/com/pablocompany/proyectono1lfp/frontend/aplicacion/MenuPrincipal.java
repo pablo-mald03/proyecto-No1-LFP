@@ -30,7 +30,6 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.ToolTipManager;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Element;
 
 /**
  *
@@ -348,7 +347,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     //Metodo que se utiliza para manejar todos los componentes y funciones previas a la generacion de reportes
     public void operarReportes() {
         //Se despliega la ventana emergente para La generacion de reportes
-        /* MostrarReportes dialog = new MostrarReportes(this, true, leerEntradas);
+        MostrarReportes dialog = new MostrarReportes(this, true, leerEntradas);
         dialog.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent e) {
@@ -363,7 +362,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
             }
         });
-        dialog.setVisible(true);*/
+        dialog.setVisible(true);
 
     }
 

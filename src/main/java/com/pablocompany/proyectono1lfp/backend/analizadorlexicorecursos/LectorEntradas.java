@@ -33,6 +33,9 @@ public class LectorEntradas {
     //Clase que intercomunica al lexer actual para poderlo operar internamente en UI
     private GestorLexer lexerActual;
 
+    //Atributo que permite conservar la referencia de los reportes
+    private GenerarReportes generacionReportes;
+
     //------------------Subregion de gramatica extraidas del config.json----------------------------
     private AutomataDeterminista constantesConfig;
 
@@ -40,7 +43,7 @@ public class LectorEntradas {
     public LectorEntradas() {
         this.constantesConfig = new AutomataDeterminista();
         this.lexerActual = new GestorLexer();
-        // this.generacionReportes = new GenerarReportes();
+        this.generacionReportes = new GenerarReportes();
     }
 
     //------------------Fin de la Subregion de gramatica extraidas del config.json----------------------------
@@ -140,7 +143,7 @@ public class LectorEntradas {
     }
 
     //Metodo utilizado para obtener la instancia y generar el reporte 
-    /* public GenerarReportes getGenerarReportes() {
+    public GenerarReportes getGenerarReportes() {
         return this.generacionReportes;
-    }*/
+    }
 }

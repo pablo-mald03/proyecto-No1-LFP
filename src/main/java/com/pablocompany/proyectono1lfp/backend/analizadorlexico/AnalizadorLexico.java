@@ -8,12 +8,9 @@ import com.pablocompany.proyectono1lfp.backend.excepciones.ConfigException;
 import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorEncontradoException;
 import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorPuntualException;
 import java.awt.Color;
-import java.awt.Point;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JTextPane;
-import javax.swing.ToolTipManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Element;
@@ -395,6 +392,7 @@ public class AnalizadorLexico {
             Lexema comentarioBloqueUbicado = listadoSentenciaLexemaBloque.get(k);
             comentarioBloqueUbicado.generalizarNodo(TokenEnum.ERROR);
             comentarioBloqueUbicado.setYaDeclarado(true);
+            comentarioBloqueUbicado.setCadenaEsperada("Se esperaba un " + TokenEnum.COMENTARIO_BLOQUE.getNombreToken());
 
             comentarioBloqueUbicado.setLexemaError(lexemaActual.getLexema() + "... Comentario de bloque sin cierre. Fila " + comentarioBloqueUbicado.getFilaCoordenada());
         }
@@ -406,6 +404,7 @@ public class AnalizadorLexico {
             for (Lexema posicion : sentenciaIndex.obtenerListadoLexemas()) {
                 posicion.generalizarNodo(TokenEnum.ERROR);
                 posicion.setYaDeclarado(true);
+                posicion.setCadenaEsperada("Se esperaba un " + TokenEnum.COMENTARIO_BLOQUE.getNombreToken());
                 posicion.setLexemaError(lexemaActual.getLexema() + "... Comentario de bloque sin cierre. Fila " + posicion.getFilaCoordenada());
             }
 
