@@ -17,7 +17,7 @@ import javax.swing.JViewport;
  *
  * @author pablo
  */
-public class MostrarReportes extends javax.swing.JDialog {
+public class ReporteLexemas extends javax.swing.JDialog {
 
     /**
      * Creates new form MostrarReportes
@@ -35,7 +35,7 @@ public class MostrarReportes extends javax.swing.JDialog {
     private ModificarTabla mdTablitaTokenizacion;
     private CrearTableros crearTableroTokenizacion;
 
-    public MostrarReportes(java.awt.Frame parent, boolean modal, LectorEntradas gestorLecturas) {
+    public ReporteLexemas(java.awt.Frame parent, boolean modal, LectorEntradas gestorLecturas) {
         super(parent, modal);
         initComponents();
 

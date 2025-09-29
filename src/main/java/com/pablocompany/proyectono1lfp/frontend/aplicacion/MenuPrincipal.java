@@ -242,7 +242,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         this.btnDepuracion.setBackground(new Color(0x533F59));
         this.btnReporteTokens.setBackground(new Color(0x533F59));
         this.btnReporteErrores.setBackground(new Color(0x4D6E4C));
-        operarReportes();
+        operarReportesErrores();
 
     }
 
@@ -260,7 +260,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         this.btnReporteTokens.setBackground(new Color(0x4D6E4C));
         this.btnReporteErrores.setBackground(new Color(0x533F59));
 
-        operarReportes();
+        operarReportesTokens();
 
     }
 
@@ -345,9 +345,30 @@ public class MenuPrincipal extends javax.swing.JFrame {
     }
 
     //Metodo que se utiliza para manejar todos los componentes y funciones previas a la generacion de reportes
-    public void operarReportes() {
+    public void operarReportesErrores() {
         //Se despliega la ventana emergente para La generacion de reportes
-        MostrarReportes dialog = new MostrarReportes(this, true, leerEntradas);
+        ReporteErrores dialog = new ReporteErrores(this, true, leerEntradas);
+        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+
+                if (gestionVentanas == 0) {
+                    regresarInicio();
+                }
+
+                if (gestionVentanas == 1) {
+                    mostrarBusquedas();
+                }
+
+            }
+        });
+        dialog.setVisible(true);
+
+    }
+    
+    public void operarReportesTokens() {
+        //Se despliega la ventana emergente para La generacion de reportes
+        ReporteLexemas dialog = new ReporteLexemas(this, true, leerEntradas);
         dialog.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent e) {

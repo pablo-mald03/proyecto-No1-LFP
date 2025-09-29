@@ -54,7 +54,7 @@ public class GenerarReportes {
     public GenerarReportes() {
 
         this.hayErrores = false;
-        //setPathPredeterminado();
+        setPathPredeterminado();
     }
 
     //Metodo que retorna si el directorio predeterminado existe 
@@ -429,7 +429,7 @@ public class GenerarReportes {
 
                     this.listaErrores.add(lexemaEvaluado.getCadenaError());
 
-                    String coordenada = "\"(";
+                    String coordenada = "\"[Fila ";
                     coordenada += String.valueOf(lexemaEvaluado.getFilaCoordenada()) + " , ";
 
                     int columnaTope = 0;
@@ -444,7 +444,7 @@ public class GenerarReportes {
 
                     }
 
-                    coordenada += String.valueOf(columnaTope) + ")\"";
+                    coordenada += "Columna "+String.valueOf(columnaTope) + "]\"";
 
                     this.listaErrores.add(coordenada);
                     
@@ -487,6 +487,8 @@ public class GenerarReportes {
 
     //Metodo que permite comunicar a la UI con la interaccion para generar reporte de errores
     public void generarReporteSinErroresTokens() throws ErrorPuntualException {
+        
+        //PENDIENTE TRABAJAR EN ESTO
         if (this.listadoTokens.isEmpty()) {
             throw new ErrorPuntualException("No hay reporte de Cantidad de Tokens cargado aun\nGenere primero el reporte para poder exportarlo");
         }
@@ -525,12 +527,14 @@ public class GenerarReportes {
         try (FileWriter writer = new FileWriter(this.pathDefinitivo + nombreArchivo + "_" + fechaHora + ".csv")) {
             writer.append(headersArchivo + "\n");
 
-            for (int i = 0; i < lista.size(); i += 2) {
+            for (int i = 0; i < lista.size(); i += 3) {
                 String campo1 = lista.get(i);
                 String campo2 = lista.get(i + 1);
+                String campo3 = lista.get(i + 2);
 
                 writer.append(campo1).append(",")
                         .append(campo2).append(",")
+                        .append(campo3).append(",")
                         .append("\n");
 
             }
