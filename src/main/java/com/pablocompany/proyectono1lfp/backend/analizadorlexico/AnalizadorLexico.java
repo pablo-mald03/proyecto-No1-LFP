@@ -8,8 +8,12 @@ import com.pablocompany.proyectono1lfp.backend.excepciones.ConfigException;
 import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorEncontradoException;
 import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorPuntualException;
 import java.awt.Color;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JTextPane;
+import javax.swing.ToolTipManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Element;
@@ -165,6 +169,7 @@ public class AnalizadorLexico {
     public void recorrerAnalisis() throws BadLocationException {
 
         this.logTransiciones.setText("");
+        limpiarLexemasSugerencia(this.areaAnalisis);
 
         for (int i = 0; i < this.listaSentencias.size(); i++) {
 
@@ -203,6 +208,16 @@ public class AnalizadorLexico {
             lexemaActual.generalizarNodo(TokenEnum.PALABRA_RESERVADA);
             lexemaActual.setYaDeclarado(true);
             ilustrarEstadosAutomata(lexemaActual);
+            return true;
+        }
+
+        String palabraSugerida = sugerirPalabra(lexemaActual);
+
+        if (palabraSugerida != null) {
+            lexemaActual.generalizarNodo(TokenEnum.ERROR);
+            lexemaActual.setYaDeclarado(true);
+            ilustrarEstadosAutomata(lexemaActual);
+            recomendarPalabra(this.areaAnalisis, lexemaActual, palabraSugerida);
             return true;
         }
 
@@ -668,4 +683,97 @@ public class AnalizadorLexico {
     }
 
     //===========================FIN DEL APARTADO PARA GESTIONAR LAS BUSQUEDAS EN EL TEXTO========================================
+    //=================REGION QUE PERMITE RECONOCER LAS PALABRAS RESERVADAS EN CUALQUIER POSICION DE LA ER============================
+    //Metodo que permite detectar si es una palabra reservada en cualquier posicion
+    public String sugerirPalabra(Lexema lexemaEntrada) {
+
+        String[] reservadas = this.automataFinitoDeterminista.getPalabrasReservadasArray();
+        String sugerencia = null;
+        int mejorDistancia = Integer.MAX_VALUE;
+
+        for (String palabra : reservadas) {
+            int distancia = metodoLevenshteinOrden(lexemaEntrada.getLexema(), palabra);
+
+            if (distancia < mejorDistancia) {
+                mejorDistancia = distancia;
+                sugerencia = palabra;
+            }
+        }
+
+        if (sugerencia != null) {
+            double similitud = 1.0 - ((double) mejorDistancia
+                    / Math.max(lexemaEntrada.getLexema().length(), sugerencia.length()));
+
+            if (lexemaEntrada.getLexema().length() < sugerencia.length() / 2) {
+                return null;
+            }
+
+            double umbral = 0.7;
+            if (similitud >= umbral && lexemaEntrada.getLexema().length() >= 2) {
+                return sugerencia;
+            }
+
+        }
+
+        return null;
+    }
+
+    //Metodo de implementacion basica de la distancia de Levenshtein 
+    /*
+        Metodologia que permite reconocer errores ortograficos
+        Agrega un caracter 
+        Quita el caracter cambiandolo por otro
+        De esta forma se permite calcular el numero minimo de operaciones para que una cadena 
+        se convierta en la otra 
+    
+        METODO MUY INTERESANTE DE LEER Y APRENDER. En lo personal no sabia pero ahora se una tecnica para recomendar palabras
+     */
+    public int metodoLevenshteinOrden(String a, String b) {
+        int[][] dependencia = new int[a.length() + 1][b.length() + 1];
+
+        for (int i = 0; i <= a.length(); i++) {
+            dependencia[i][0] = i;
+        }
+        for (int j = 0; j <= b.length(); j++) {
+            dependencia[0][j] = j;
+        }
+
+        for (int i = 1; i <= a.length(); i++) {
+            for (int j = 1; j <= b.length(); j++) {
+                int costo = (a.charAt(i - 1) == b.charAt(j - 1)) ? 0 : 1;
+                dependencia[i][j] = Math.min(
+                        Math.min(dependencia[i - 1][j] + 1, dependencia[i][j - 1] + 1),
+                        dependencia[i - 1][j - 1] + costo
+                );
+            }
+        }
+
+        return dependencia[a.length()][b.length()];
+    }
+
+    //Metodo que permite mostrar las sugerencias en el cuadro de edicion
+    public void recomendarPalabra(JTextPane logEdicion, Lexema palabraReservada, String sugerencia) {
+
+        System.out.println("Sugerencia " + sugerencia);
+
+        List<Lexema> lista = (List<Lexema>) logEdicion.getClientProperty("lexemasErroneos");
+        if (lista == null) {
+            lista = new ArrayList<>();
+            logEdicion.putClientProperty("lexemasErroneos", lista);
+        }
+
+        palabraReservada.setSugerenciaEstimada(sugerencia);
+        lista.add(palabraReservada);
+    }
+
+    //Metodo que permite ir limpiando la lista por cada vez que se escribe a tiempo real
+    public void limpiarLexemasSugerencia(JTextPane pane) {
+        List<Lexema> lista = (List<Lexema>) pane.getClientProperty("lexemasErroneos");
+        if (lista != null) {
+            lista.clear();
+        }
+        pane.putClientProperty("lexemaLastShown", null);
+    }
+
+    //=================FIN DE LA REGION QUE PERMITE RECONOCER LAS PALABRAS RESERVADAS EN CUALQUIER POSICION DE LA ER=============================
 }

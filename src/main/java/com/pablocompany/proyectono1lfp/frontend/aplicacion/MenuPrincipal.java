@@ -5,6 +5,7 @@
 package com.pablocompany.proyectono1lfp.frontend.aplicacion;
 
 import com.pablocompany.proyectono1lfp.backend.analizadorlexico.AnalizadorLexico;
+import com.pablocompany.proyectono1lfp.backend.analizadorlexico.Lexema;
 import com.pablocompany.proyectono1lfp.backend.analizadorlexicorecursos.LectorEntradas;
 import com.pablocompany.proyectono1lfp.backend.analizadorlexicorecursos.ManejadorArchivos;
 import com.pablocompany.proyectono1lfp.backend.aplicacion.ColocarFondos;
@@ -17,12 +18,19 @@ import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorPuntualException
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
+import javax.swing.ToolTipManager;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Element;
 
 /**
  *
@@ -52,6 +60,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         initComponents();
         configurarTabReal();
         textEdicionArchivo.setFocusTraversalKeysEnabled(false);
+
         this.setLocationRelativeTo(null);
 
         ColocarFondos pintarPanel = new ColocarFondos(this, this.panelPrincipal);
@@ -89,8 +98,11 @@ public class MenuPrincipal extends javax.swing.JFrame {
         //Instanica que permite leer los archivos
         this.leerEntradas = new LectorEntradas();
 
+        instalarTooltipsEnPane(this.textEdicionArchivo);
+
     }
 
+    //Metodo que permite evaluar las tabulaciones y no dejar solo las tabulaciones predeterminadas
     private void configurarTabReal() {
         textEdicionArchivo.setFocusTraversalKeysEnabled(false); // permite capturar TAB
 
@@ -109,6 +121,68 @@ public class MenuPrincipal extends javax.swing.JFrame {
                 }
             }
         });
+    }
+
+    //Metodo que permite inicializar las recomendaciones
+    private void instalarTooltipsEnPane(JTextPane pane) {
+        if (pane.getClientProperty("tooltipListenerInstalled") != null) {
+            return;
+        }
+
+        MouseMotionListener mml = new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                try {
+                    int pos = pane.viewToModel2D(e.getPoint());
+
+                    @SuppressWarnings("unchecked")
+                    List<Lexema> lista = (List<Lexema>) pane.getClientProperty("lexemasErroneos");
+                    Lexema hit = null;
+
+                    if (lista != null) {
+                        for (Lexema l : lista) {
+                            int fila = l.getFilaCoordenada() - 1;
+                            int col = l.getValorNodo(0).getColumna() - 1;
+                            Element line = pane.getDocument().getDefaultRootElement().getElement(fila);
+                            int start = line.getStartOffset() + col;
+                            int length = l.getLongitudNodo();
+
+                            int end = start + length;
+
+                            if (line == null) {
+                                continue;
+                            }
+                            
+                            if (pos >= start && pos < end) {
+                                hit = l;
+                                break;
+                            }
+
+                        }
+                    }
+                    Lexema last = (Lexema) pane.getClientProperty("lexemaLastShown");
+                    if (hit == null) {
+                        if (last != null) {
+                            pane.putClientProperty("lexemaLastShown", null);
+                            pane.setToolTipText(null);
+                            ToolTipManager.sharedInstance().mouseMoved(e); 
+                        }
+                    } else {
+                        if (last != hit) {
+                            pane.putClientProperty("lexemaLastShown", hit);
+                            pane.setToolTipText("¿Quiso decir '" + hit.getSugerenciaEstimada() + "'?");
+                            ToolTipManager.sharedInstance().mouseMoved(e);
+                        }
+                    }
+                } catch (Exception ex) {
+                    System.out.println("no se puede mostrar el tooltip");
+                }
+            }
+        };
+
+        pane.addMouseMotionListener(mml);
+        pane.putClientProperty("tooltipListenerInstalled", Boolean.TRUE);
+        ToolTipManager.sharedInstance().registerComponent(pane);
     }
 
     //===========================================APARTADO DE METODOS QUE SE UTILIZAN PARA DINAMIZAR LA UI===========================================

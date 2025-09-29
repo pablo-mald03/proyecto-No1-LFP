@@ -61,7 +61,7 @@ public class NavegarEstados {
         if (lexemaActual.getLexema().isBlank()) {
             return;
         }
-
+        
         try {
             declararEstadoInicial(this.lexemaAnalisis, this.lexemaAnalisis.getValorNodo(0));
             this.lexemaAnalisis.setIndiceViajeAFD(0);

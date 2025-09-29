@@ -4,7 +4,6 @@
  */
 package com.pablocompany.proyectono1lfp.backend.analizadorlexico;
 
-
 /**
  *
  * @author pablo
@@ -85,5 +84,16 @@ public class AutomataDeterminista {
         return numero.matches(ER_NUMEROS);
     }
 
-    //=====================FIN DEL APARTADO DE METODOS QUE SIRVEN PARA PODER MOSTRAR EN LA UI LA CONFIGURACION====================
+    //=====================APARTADO QUE PERMITE CONVERTIR EN ARREGLO LA EXPRESION REGULAR PARA PODERLA RECONOCER DESORDENADA===================
+    //Metodo que permite extraer como arreglo la expresion regular de palabras reservadas
+    public String[] getPalabrasReservadasArray() {
+
+        String limpio = ER_PALABRAS_RESERVADAS.replaceAll("[\\^\\$]", "");
+
+        limpio = limpio.replaceAll("^\\(|\\)$", "");
+
+        return limpio.split("\\|");
+    }
+
+    //=====================FIN DEL APARTADO QUE PERMITE CONVERTIR EN ARREGLO LA EXPRESION REGULAR PARA PODERLA RECONOCER DESORDENADA===================
 }

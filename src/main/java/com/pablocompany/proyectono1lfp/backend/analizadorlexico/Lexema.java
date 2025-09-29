@@ -56,6 +56,16 @@ public class Lexema {
         this.indiceViajeAFD = 0;
     }
 
+    //Metodo que permite obtener la palabra sugerida
+    public String getSugerenciaEstimada() {
+        return sugerenciaEstimada;
+    }
+
+    //Metodo que permite generar la sugerencia que se va a buscar
+    public void setSugerenciaEstimada(String sugerenciaEstimada) {
+        this.sugerenciaEstimada = sugerenciaEstimada;
+    }
+    
     //Metodo que sirve para poder saber de que estado transicionara
     public int getIndiceViajeAFD() {
         return indiceViajeAFD;
