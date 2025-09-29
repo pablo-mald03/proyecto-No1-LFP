@@ -394,7 +394,7 @@ public class AnalizadorLexico {
             comentarioBloqueUbicado.setYaDeclarado(true);
             comentarioBloqueUbicado.setCadenaEsperada("Se esperaba un " + TokenEnum.COMENTARIO_BLOQUE.getNombreToken());
 
-            comentarioBloqueUbicado.setLexemaError(lexemaActual.getLexema() + "... Comentario de bloque sin cierre. Fila " + comentarioBloqueUbicado.getFilaCoordenada());
+            comentarioBloqueUbicado.setLexemaError(comentarioBloqueUbicado.getLexema() + "... Comentario de bloque sin cierre (*/). Fila " + comentarioBloqueUbicado.getFilaCoordenada());
         }
 
         for (int i = iterador + 1; i < listaSentencias.size(); i++) {
@@ -405,7 +405,7 @@ public class AnalizadorLexico {
                 posicion.generalizarNodo(TokenEnum.ERROR);
                 posicion.setYaDeclarado(true);
                 posicion.setCadenaEsperada("Se esperaba un " + TokenEnum.COMENTARIO_BLOQUE.getNombreToken());
-                posicion.setLexemaError(lexemaActual.getLexema() + "... Comentario de bloque sin cierre. Fila " + posicion.getFilaCoordenada());
+                posicion.setLexemaError(posicion.getLexema() + "... Comentario de bloque sin cierre (*/). Fila " + posicion.getFilaCoordenada());
             }
 
         }

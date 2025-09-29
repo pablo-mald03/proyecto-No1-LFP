@@ -122,7 +122,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         });
     }
 
-    //Metodo que permite inicializar las recomendaciones (METODO MAS HERMOSO PERO FEO)
+    //Metodo que permite inicializar las recomendaciones y poderlas mostrar en pantalla (METODO MAS HERMOSO PERO FEO)
     private void instalarTooltipsEnPane(JTextPane pane) {
         if (pane.getClientProperty("tooltipListenerInstalled") != null) {
             return;
@@ -344,7 +344,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
     }
 
-    //Metodo que se utiliza para manejar todos los componentes y funciones previas a la generacion de reportes
+    //Metodo que se utiliza para manejar todos los componentes y funciones previas a la generacion de reportes de errores
     public void operarReportesErrores() {
         //Se despliega la ventana emergente para La generacion de reportes
         ReporteErrores dialog = new ReporteErrores(this, true, leerEntradas);
@@ -366,6 +366,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
     }
     
+    //Metodo que permite mostrar los reportes de lexemas/tokens
     public void operarReportesTokens() {
         //Se despliega la ventana emergente para La generacion de reportes
         ReporteLexemas dialog = new ReporteLexemas(this, true, leerEntradas);
