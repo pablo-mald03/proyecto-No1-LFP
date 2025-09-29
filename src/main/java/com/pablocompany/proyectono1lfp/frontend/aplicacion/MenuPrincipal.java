@@ -123,7 +123,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         });
     }
 
-    //Metodo que permite inicializar las recomendaciones
+    //Metodo que permite inicializar las recomendaciones (METODO MAS HERMOSO PERO FEO)
     private void instalarTooltipsEnPane(JTextPane pane) {
         if (pane.getClientProperty("tooltipListenerInstalled") != null) {
             return;
@@ -133,7 +133,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
             @Override
             public void mouseMoved(MouseEvent e) {
                 try {
-                    int pos = pane.viewToModel2D(e.getPoint());
+                    int pos = pane.viewToModel2D(e.getPoint()); 
 
                     @SuppressWarnings("unchecked")
                     List<Lexema> lista = (List<Lexema>) pane.getClientProperty("lexemasErroneos");
@@ -141,31 +141,21 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
                     if (lista != null) {
                         for (Lexema l : lista) {
-                            int fila = l.getFilaCoordenada() - 1;
-                            int col = l.getValorNodo(0).getColumna() - 1;
-                            Element line = pane.getDocument().getDefaultRootElement().getElement(fila);
-                            int start = line.getStartOffset() + col;
-                            int length = l.getLongitudNodo();
-
-                            int end = start + length;
-
-                            if (line == null) {
-                                continue;
-                            }
-                            
-                            if (pos >= start && pos < end) {
+                            int start = l.getOffsetInicio(); 
+                            int end = l.getOffsetFin();    
+                            if (pos >= start && pos <= end) {
                                 hit = l;
                                 break;
                             }
-
                         }
                     }
+
                     Lexema last = (Lexema) pane.getClientProperty("lexemaLastShown");
                     if (hit == null) {
                         if (last != null) {
                             pane.putClientProperty("lexemaLastShown", null);
                             pane.setToolTipText(null);
-                            ToolTipManager.sharedInstance().mouseMoved(e); 
+                            ToolTipManager.sharedInstance().mouseMoved(e);
                         }
                     } else {
                         if (last != hit) {

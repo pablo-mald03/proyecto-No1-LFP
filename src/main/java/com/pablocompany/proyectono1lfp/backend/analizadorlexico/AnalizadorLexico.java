@@ -133,6 +133,7 @@ public class AnalizadorLexico {
         }
 
         //Metodo encargado de poder procesar y convertir todos los lexemas
+        int ubicacionFisica = 0;
         for (int i = 0; i < this.listaSentencias.size(); i++) {
 
             Sentencia sentenciaActiva = this.listaSentencias.get(i);
@@ -149,12 +150,23 @@ public class AnalizadorLexico {
 
                 String palabra = lexemaDado.getLexema();
 
-                if (palabra == null || palabra.isEmpty()) {
+                if (palabra == null) {
+
+                    ubicacionFisica += 1;
+                    continue;
+                }
+
+                if (palabra.isEmpty()) {
+
+                    ubicacionFisica += 1;
                     continue;
                 }
 
                 //Metodo que se encarga de separar todos los nodos
                 columna = lexemaDado.separarNodos(palabra, columna, fila);
+                ubicacionFisica = lexemaDado.generarEspacioFisico(ubicacionFisica);
+                lexemaDado.calcularOffsets();
+
                 columna++;
             }
 
@@ -753,9 +765,6 @@ public class AnalizadorLexico {
 
     //Metodo que permite mostrar las sugerencias en el cuadro de edicion
     public void recomendarPalabra(JTextPane logEdicion, Lexema palabraReservada, String sugerencia) {
-
-        System.out.println("Sugerencia " + sugerencia);
-
         List<Lexema> lista = (List<Lexema>) logEdicion.getClientProperty("lexemasErroneos");
         if (lista == null) {
             lista = new ArrayList<>();

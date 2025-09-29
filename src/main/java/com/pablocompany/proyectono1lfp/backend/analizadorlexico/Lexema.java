@@ -46,6 +46,9 @@ public class Lexema {
     //False si solo ha sido cambiado de estado pero aun no confirmado
     private boolean yaDeclarado;
 
+    private int offsetInicio;
+    private int offsetFin;
+
     public Lexema(String lexemaGenerado, int lineaCoordenada) {
 
         this.lexemaGenerado = lexemaGenerado;
@@ -54,6 +57,16 @@ public class Lexema {
         this.yaDeclarado = false;
         this.lexemaError = "";
         this.indiceViajeAFD = 0;
+    }
+
+    //Metodos que permiten calcular el offset de inicio
+    public int getOffsetInicio() {
+        return offsetInicio;
+    }
+
+    //Metodo que permite calcular y retornar el offset de finalizacion
+    public int getOffsetFin() {
+        return offsetFin;
     }
 
     //Metodo que permite obtener la palabra sugerida
@@ -65,7 +78,7 @@ public class Lexema {
     public void setSugerenciaEstimada(String sugerenciaEstimada) {
         this.sugerenciaEstimada = sugerenciaEstimada;
     }
-    
+
     //Metodo que sirve para poder saber de que estado transicionara
     public int getIndiceViajeAFD() {
         return indiceViajeAFD;
@@ -212,6 +225,30 @@ public class Lexema {
         }
 
         return this.estadoAnalisis;
+    }
+
+    //Metodo que registra el espacio lineal o fisico que ocupa el caracter
+    public int generarEspacioFisico(int espacio) {
+
+        int espacioRecorrido = espacio;
+
+        for (int i = 0; i < this.listaNodos.size(); i++) {
+
+            Nodo nodoLexema = this.listaNodos.get(i);
+            nodoLexema.setUbicacionFisica(espacioRecorrido);
+            espacioRecorrido++;
+        }
+
+        return espacioRecorrido;
+    }
+
+    //Metodo que calcula e instancia los offsets de inicio y fin del lexema
+    public void calcularOffsets() {
+        if (listaNodos.isEmpty()) {
+            return;
+        }
+        this.offsetInicio = listaNodos.get(0).getUbicacionFisica();
+        this.offsetFin = offsetInicio + this.getLongitudNodo();
     }
 
 }

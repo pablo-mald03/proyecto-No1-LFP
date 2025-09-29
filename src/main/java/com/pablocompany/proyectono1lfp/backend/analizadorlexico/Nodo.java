@@ -20,6 +20,9 @@ public class Nodo {
     //Permite ubicar cual fue el nodo que fallo
     //true es el causante del fallo
     private boolean comodinError;
+    
+    //Atributo que permite saber el espacio fisico ocupado por el nodo en la lista
+    private int ubicacionFisica; 
 
     public Nodo(char caracter, int fila, int columna, TokenEnum tipo) {
         this.caracter = caracter;
@@ -27,8 +30,18 @@ public class Nodo {
         this.columna = columna;
         this.tipo = tipo;
         this.comodinError = false;
+        this.ubicacionFisica = 0;
     }
 
+    //Par de metodos que permiten saber la ubicacion lineal de los nodos
+    public int getUbicacionFisica() {
+        return ubicacionFisica;
+    }
+
+    public void setUbicacionFisica(int ubicacionFisica) {
+        this.ubicacionFisica = ubicacionFisica;
+    }
+    
     //Ayudan a ubicar rapidamente cual es el token comodin para empezar a ciclar para atras
     public boolean esComodin() {
         return comodinError;
