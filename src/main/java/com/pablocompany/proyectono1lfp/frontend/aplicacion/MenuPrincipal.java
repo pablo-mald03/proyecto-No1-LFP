@@ -320,8 +320,12 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
             this.leerEntradas.getLexerActual().obtenerModoDepuracion().reiniciarDepurador();
 
-        } catch (NullPointerException | ConfigException ex) {
+            this.leerEntradas.getLexerActual().obtenerModoDepuracion().setPaneDepuracion(this.txtLogDepuraciones);
 
+        } catch (NullPointerException ex) {
+
+        } catch (ConfigException ex1) {
+            JOptionPane.showMessageDialog(this, ex1.getMessage(), "Texto Vacio", JOptionPane.ERROR_MESSAGE);
         }
 
     }
@@ -1152,14 +1156,74 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
     private void btnFinalizarDepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFinalizarDepActionPerformed
         //Boton que permite avanzar directamente hasta el ultimo estado
+          try {
+
+            if (this.leerEntradas == null) {
+                JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador\nEscribe algo para poderlo depurar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (this.leerEntradas.getLexerActual() == null) {
+                JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador para depurar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            this.leerEntradas.getLexerActual().obtenerModoDepuracion().ejecutarFinal();
+
+        } catch (NullPointerException ex) {
+            JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador\nEscribe algo para poderlo depurar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+
+        } catch (ConfigException ex1) {
+             JOptionPane.showMessageDialog(this, ex1.getMessage(), "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnFinalizarDepActionPerformed
 
     private void btnReiniciarDepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReiniciarDepActionPerformed
         //Boton que permite reiniciar la depuracion en el lexema
+         try {
+
+            if (this.leerEntradas == null) {
+                JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador\nEscribe algo para poderlo depurar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (this.leerEntradas.getLexerActual() == null) {
+                JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador para depurar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            this.leerEntradas.getLexerActual().obtenerModoDepuracion().reiniciarAnalisisDepurado();
+
+        } catch (NullPointerException ex) {
+            JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador\nEscribe algo para poderlo depurar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+
+        } catch (ConfigException ex1) {
+             JOptionPane.showMessageDialog(this, ex1.getMessage(), "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnReiniciarDepActionPerformed
 
     private void btnRetrocederDepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRetrocederDepActionPerformed
         // Boton que permite dar un paso atras en el analisis
+         try {
+
+            if (this.leerEntradas == null) {
+                JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador\nEscribe algo para poderlo depurar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (this.leerEntradas.getLexerActual() == null) {
+                JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador para depurar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            this.leerEntradas.getLexerActual().obtenerModoDepuracion().regresarPaso();
+
+        } catch (NullPointerException ex) {
+            JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador\nEscribe algo para poderlo depurar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+
+        } catch (ConfigException ex1) {
+             JOptionPane.showMessageDialog(this, ex1.getMessage(), "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnRetrocederDepActionPerformed
 
     private void btnAvanzarDepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAvanzarDepActionPerformed
@@ -1175,10 +1239,14 @@ public class MenuPrincipal extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador para depurar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            
+            this.leerEntradas.getLexerActual().obtenerModoDepuracion().avanzarSiguientePaso();
 
         } catch (NullPointerException ex) {
             JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador\nEscribe algo para poderlo depurar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
 
+        } catch (ConfigException ex1) {
+             JOptionPane.showMessageDialog(this, ex1.getMessage(), "Texto Vacio", JOptionPane.ERROR_MESSAGE);
         }
 
     }//GEN-LAST:event_btnAvanzarDepActionPerformed
