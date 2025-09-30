@@ -483,13 +483,23 @@ public class ReporteLexemas extends javax.swing.JDialog {
 
     private void btnGenerarDiagramaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarDiagramaActionPerformed
         //Permite generar la ilustracion del AFD
+        try {
+            if (this.gestionLecturas.getGenerarReportes().reporteLexemasGenerado()) {
+                JOptionPane.showMessageDialog(this, "No se ha generado el reporte de lexemas\nPresione el boton en el \"Reporte Tokens Lexemas\"", "Reporte de lexemas no generado aun", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-        if (this.lexemaSeleccionado == null) {
-            JOptionPane.showMessageDialog(this, "Token no seleccionado \nDa click sobre el lexema que desees ver en el \"Reporte de Tokens Lexemas\"", "Lexema no Seleccionado", JOptionPane.INFORMATION_MESSAGE);
-            return;
+            if (this.lexemaSeleccionado == null) {
+                JOptionPane.showMessageDialog(this, "Token no seleccionado \nDa click sobre el lexema que desees ver en el \"Reporte de Tokens Lexemas\"", "Lexema no Seleccionado", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
+            ilustrarTransiciones();
+
+        } catch (NullPointerException ex) {
+            JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador\nEscribe algo para poderlo analizar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+
         }
-
-        ilustrarTransiciones();
     }//GEN-LAST:event_btnGenerarDiagramaActionPerformed
 
     /**

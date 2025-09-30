@@ -225,7 +225,7 @@ public class AnalizadorLexico {
         if (palabraSugerida != null) {
             lexemaActual.generalizarNodo(TokenEnum.ERROR);
             lexemaActual.setYaDeclarado(true);
-            ilustrarEstadosAutomata(lexemaActual);
+            ilustrarErrorAvanzado(lexemaActual);
             lexemaActual.setLexemaError("palabra reservada mal escrita ");
             lexemaActual.setCadenaEsperada("Se esperaba la palabra reservada " + palabraSugerida);
             recomendarPalabra(this.areaAnalisis, lexemaActual, palabraSugerida);
@@ -410,6 +410,45 @@ public class AnalizadorLexico {
                 posicion.setLexemaError(posicion.getLexema() + "... Comentario de bloque sin cierre (*/). Fila " + posicion.getFilaCoordenada());
             }
 
+        }
+
+    }
+
+    //Metodo que permite reportar un error especial de palabra reservada 
+    public void ilustrarErrorAvanzado(Lexema lexemaEvaluado) {
+
+        try {
+
+            Color colorEstados = new Color(0xB81D00);
+
+            Color colorTexto = obtenerColorPorToken(lexemaEvaluado.getEstadoAnalisis());
+
+            insertarToken("Con " + lexemaEvaluado.getEstadoAnalisis().getContexto() + " avanzado: ", Color.BLACK, this.logTransiciones);
+
+            insertarToken(" " + lexemaEvaluado.getLexema(), colorTexto, this.logTransiciones);
+
+            insertarToken("\n", Color.BLACK, this.logTransiciones);
+
+            insertarToken("No se ha llegado al estado de aceptacion", colorEstados, this.logTransiciones);
+            insertarToken("\n", Color.BLACK, this.logTransiciones);
+
+            insertarToken("Moviendo al estado de Error con la palabra reservada mal escrita: ", colorEstados, this.logTransiciones);
+
+            insertarToken(lexemaEvaluado.getLexema(), colorTexto, this.logTransiciones);
+
+            insertarToken("\n", Color.BLACK, this.logTransiciones);
+
+            insertarToken("Guardando token " + lexemaEvaluado.getEstadoAnalisis().getNombreToken() + ". Lexema: " + lexemaEvaluado.getLexema(), new Color(0x085717), this.logTransiciones);
+
+            insertarToken("\n", Color.BLACK, this.logTransiciones);
+
+            insertarToken("Reiniciando Automata...", Color.BLACK, this.logTransiciones);
+
+            insertarToken("\n", Color.BLACK, this.logTransiciones);
+            insertarToken("\n", Color.BLACK, this.logTransiciones);
+
+        } catch (BadLocationException ex) {
+            System.out.println("No se ha podido pintar el log de transiciones");
         }
 
     }

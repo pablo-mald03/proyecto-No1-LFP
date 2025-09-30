@@ -61,7 +61,7 @@ public class NavegarEstados {
         if (lexemaActual.getLexema().isBlank()) {
             return;
         }
-        
+
         try {
             declararEstadoInicial(this.lexemaAnalisis, this.lexemaAnalisis.getValorNodo(0));
             this.lexemaAnalisis.setIndiceViajeAFD(0);
@@ -160,6 +160,7 @@ public class NavegarEstados {
                 int indiceError = this.lexemaAnalisis.getIndiceError();
 
                 this.lexemaAnalisis.getValorNodo(indiceError).setComodin(false);
+                this.lexemaAnalisis.setCadenaEsperada("Se esperaba una " + TokenEnum.CADENA.getNombreToken());
 
                 for (int i = indiceError; i >= 0; i--) {
 
@@ -167,7 +168,17 @@ public class NavegarEstados {
                     nodoError.setTipo(TokenEnum.ERROR);
                 }
 
+                this.lexemaAnalisis.setEstadoAnalisis(TokenEnum.ERROR);
+                this.lexemaAnalisis.setLexemaError(ex.getMessage());
+
                 this.logErrores.setText(this.logErrores.getText() + ex.getMessage() + "\n");
+
+                anunciarLexema(this.lexemaAnalisis);
+
+                if (!this.lexemaAnalisis.getCadenaError().isBlank()) {
+                    //Se registra el error en las transiciones
+                    anunciarErrorCadena(this.lexemaAnalisis);
+                }
 
             } catch (AnalizadorLexicoException ex1) {
                 System.out.println("No se encontro indice " + ex1.getMessage());
@@ -253,7 +264,7 @@ public class NavegarEstados {
             if (!String.valueOf(nodoCaracterFin).equals("\"")) {
                 nodoTemporal.setTipo(TokenEnum.ERROR);
                 nodoTemporal.setComodin(true);
-                throw new ErrorPuntualException(lexemaParametro.getLexema() + " No tiene comillas de cierre. NO TOKEN");
+                throw new ErrorPuntualException(lexemaParametro.getLexema() + " -> No tiene comillas de cierre.");
             }
 
             lexemaParametro.setEstadoAnalisis(TokenEnum.CADENA);
@@ -269,7 +280,7 @@ public class NavegarEstados {
         if (!String.valueOf(nodoCaracterInicio).equals("\"") && String.valueOf(nodoCaracterTemporalFin).equals("\"")) {
             nodoTemporal1.setTipo(TokenEnum.ERROR);
             nodoTemporal1.setComodin(true);
-            throw new ErrorPuntualException(lexemaParametro.getLexema() + " No tiene comillas de apertura. NO TOKEN");
+            throw new ErrorPuntualException(lexemaParametro.getLexema() + " -> No tiene comillas de apertura.");
         }
 
         //Declara el estado de analisis como identificador
@@ -327,6 +338,26 @@ public class NavegarEstados {
             insertarEstadoTransicion("\n", Color.BLACK, this.logTransicionesAFD);
 
             insertarEstadoTransicion("Reiniciando Automata...", Color.BLACK, this.logTransicionesAFD);
+
+            insertarEstadoTransicion("\n", Color.BLACK, this.logTransicionesAFD);
+
+            lexemaError.setIndiceViajeAFD(0);
+
+        } catch (BadLocationException ex) {
+            System.out.println("No se ha podido pintar el log de transiciones");
+        }
+
+    }
+    
+    //Metodo que permite avisar que hubo un erro en el lexema
+    private void anunciarErrorCadena(Lexema lexemaError) {
+        try {
+            Color colorEstados = new Color(0xB81D00);
+
+            insertarEstadoTransicion("No se ha llegado al estado de aceptacion", colorEstados, this.logTransicionesAFD);
+            insertarEstadoTransicion("\n", Color.BLACK, this.logTransicionesAFD);
+
+            insertarEstadoTransicion("Moviendo al estado de Error con la cadena de texto ", colorEstados, this.logTransicionesAFD);
 
             insertarEstadoTransicion("\n", Color.BLACK, this.logTransicionesAFD);
 
