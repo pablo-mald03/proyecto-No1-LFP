@@ -8,9 +8,13 @@ import com.pablocompany.proyectono1lfp.backend.excepciones.ConfigException;
 import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorEncontradoException;
 import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorPuntualException;
 import java.awt.Color;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JTextPane;
+import javax.swing.ToolTipManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Element;
@@ -179,6 +183,7 @@ public class AnalizadorLexico {
 
         this.logTransiciones.setText("");
         limpiarLexemasSugerencia(this.areaAnalisis);
+        instalarTooltipsEnPane(this.areaAnalisis);
 
         for (int i = 0; i < this.listaSentencias.size(); i++) {
 
@@ -823,6 +828,64 @@ public class AnalizadorLexico {
             lista.clear();
         }
         pane.putClientProperty("lexemaLastShown", null);
+        pane.setToolTipText(null);
+
+        for (MouseMotionListener mml : pane.getMouseMotionListeners()) {
+            pane.removeMouseMotionListener(mml);
+        }
+        pane.putClientProperty("tooltipListenerInstalled", null);
+    }
+
+    //Metodo que permite inicializar las recomendaciones y poderlas mostrar en pantalla (METODO MAS HERMOSO PERO FEO)
+    private void instalarTooltipsEnPane(JTextPane pane) {
+        if (pane.getClientProperty("tooltipListenerInstalled") != null) {
+            return;
+        }
+
+        MouseMotionListener mml = new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                try {
+                    int pos = pane.viewToModel2D(e.getPoint());
+
+                    @SuppressWarnings("unchecked")
+                    List<Lexema> lista = (List<Lexema>) pane.getClientProperty("lexemasErroneos");
+                    Lexema hit = null;
+
+                    if (lista != null) {
+                        for (Lexema l : lista) {
+                            int start = l.getOffsetInicio();
+                            int end = l.getOffsetFin();
+                            if (pos >= start && pos <= end) {
+                                hit = l;
+                                break;
+                            }
+                        }
+                    }
+
+                    Lexema last = (Lexema) pane.getClientProperty("lexemaLastShown");
+                    if (hit == null) {
+                        if (last != null) {
+                            pane.putClientProperty("lexemaLastShown", null);
+                            pane.setToolTipText(null);
+                            ToolTipManager.sharedInstance().mouseMoved(e);
+                        }
+                    } else {
+                        if (last != hit) {
+                            pane.putClientProperty("lexemaLastShown", hit);
+                            pane.setToolTipText("¿Quiso decir '" + hit.getSugerenciaEstimada() + "'?");
+                            ToolTipManager.sharedInstance().mouseMoved(e);
+                        }
+                    }
+                } catch (Exception ex) {
+                    System.out.println("no se puede mostrar el tooltip");
+                }
+            }
+        };
+
+        pane.addMouseMotionListener(mml);
+        pane.putClientProperty("tooltipListenerInstalled", Boolean.TRUE);
+        ToolTipManager.sharedInstance().registerComponent(pane);
     }
 
     //=================FIN DE LA REGION QUE PERMITE RECONOCER LAS PALABRAS RESERVADAS EN CUALQUIER POSICION DE LA ER=============================

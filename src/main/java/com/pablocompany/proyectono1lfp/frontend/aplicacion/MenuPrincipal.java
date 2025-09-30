@@ -97,8 +97,6 @@ public class MenuPrincipal extends javax.swing.JFrame {
         //Instanica que permite leer los archivos
         this.leerEntradas = new LectorEntradas();
 
-        instalarTooltipsEnPane(this.textEdicionArchivo);
-
     }
 
     //Metodo que permite evaluar las tabulaciones y no dejar solo las tabulaciones predeterminadas
@@ -122,57 +120,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         });
     }
 
-    //Metodo que permite inicializar las recomendaciones y poderlas mostrar en pantalla (METODO MAS HERMOSO PERO FEO)
-    private void instalarTooltipsEnPane(JTextPane pane) {
-        if (pane.getClientProperty("tooltipListenerInstalled") != null) {
-            return;
-        }
-
-        MouseMotionListener mml = new MouseMotionAdapter() {
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                try {
-                    int pos = pane.viewToModel2D(e.getPoint()); 
-
-                    @SuppressWarnings("unchecked")
-                    List<Lexema> lista = (List<Lexema>) pane.getClientProperty("lexemasErroneos");
-                    Lexema hit = null;
-
-                    if (lista != null) {
-                        for (Lexema l : lista) {
-                            int start = l.getOffsetInicio(); 
-                            int end = l.getOffsetFin();    
-                            if (pos >= start && pos <= end) {
-                                hit = l;
-                                break;
-                            }
-                        }
-                    }
-
-                    Lexema last = (Lexema) pane.getClientProperty("lexemaLastShown");
-                    if (hit == null) {
-                        if (last != null) {
-                            pane.putClientProperty("lexemaLastShown", null);
-                            pane.setToolTipText(null);
-                            ToolTipManager.sharedInstance().mouseMoved(e);
-                        }
-                    } else {
-                        if (last != hit) {
-                            pane.putClientProperty("lexemaLastShown", hit);
-                            pane.setToolTipText("¿Quiso decir '" + hit.getSugerenciaEstimada() + "'?");
-                            ToolTipManager.sharedInstance().mouseMoved(e);
-                        }
-                    }
-                } catch (Exception ex) {
-                    System.out.println("no se puede mostrar el tooltip");
-                }
-            }
-        };
-
-        pane.addMouseMotionListener(mml);
-        pane.putClientProperty("tooltipListenerInstalled", Boolean.TRUE);
-        ToolTipManager.sharedInstance().registerComponent(pane);
-    }
+    
 
     //===========================================APARTADO DE METODOS QUE SE UTILIZAN PARA DINAMIZAR LA UI===========================================
     //Metodo de UI que permite nombrar algo y no permite vacios
