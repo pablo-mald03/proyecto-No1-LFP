@@ -50,6 +50,9 @@ public class AnalizadorLexico {
     //Se conserva una lista para poder dar el paso al analisis de datos (SOLO ES PROVISIONAL)
     private ArrayList<String> listaEntrada = new ArrayList<>(6000);
 
+    //Atributo que almacena la referencia de la sentencia a procesar
+    private Depurador referenciaDepuracion;
+
     public AnalizadorLexico(JTextPane areaAnalisis, ArrayList<String> listaExtraida, JTextPane paneErrores, JTextPane logAreaTransicion, AutomataDeterminista configuracion) throws ConfigException {
         this.areaAnalisis = areaAnalisis;
 
@@ -62,6 +65,8 @@ public class AnalizadorLexico {
         this.logTransiciones = logAreaTransicion;
 
         this.analizarEstados = new NavegarEstados(automataFinitoDeterminista, paneErrores, this.logTransiciones);
+
+        this.referenciaDepuracion = null;
 
     }
 
@@ -209,6 +214,8 @@ public class AnalizadorLexico {
             }
 
         }
+
+        this.referenciaDepuracion = new Depurador(this.listaSentencias);
 
         pintarLogSalida(this.areaAnalisis, true);
 
@@ -553,6 +560,17 @@ public class AnalizadorLexico {
 
         mostrarErrores(enAnalisis);
 
+    }
+    
+    
+    //Metodo que permite obtener la referencia del depurador
+    public Depurador obtenerModoDepuracion() throws ConfigException{
+        
+        if(this.referenciaDepuracion == null){
+            throw new ConfigException("El texto se encuentra vacio\nEscriba alguna palabra para depurar"); 
+        }
+        
+        return this.referenciaDepuracion;
     }
 
     //Metodo encargado de imprimir los errores en el log de errores

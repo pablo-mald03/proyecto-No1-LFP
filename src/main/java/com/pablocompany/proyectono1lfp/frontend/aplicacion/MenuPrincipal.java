@@ -5,7 +5,6 @@
 package com.pablocompany.proyectono1lfp.frontend.aplicacion;
 
 import com.pablocompany.proyectono1lfp.backend.analizadorlexico.AnalizadorLexico;
-import com.pablocompany.proyectono1lfp.backend.analizadorlexico.Lexema;
 import com.pablocompany.proyectono1lfp.backend.analizadorlexicorecursos.LectorEntradas;
 import com.pablocompany.proyectono1lfp.backend.analizadorlexicorecursos.ManejadorArchivos;
 import com.pablocompany.proyectono1lfp.backend.aplicacion.ColocarFondos;
@@ -18,17 +17,11 @@ import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorPuntualException
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
-import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
-import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
-import javax.swing.ToolTipManager;
 import javax.swing.text.BadLocationException;
 
 /**
@@ -82,7 +75,18 @@ public class MenuPrincipal extends javax.swing.JFrame {
         this.textLogErrores.setEditable(false);
         this.textEdicionArchivo.setEditable(true);
         this.txtLogTransiciones.setEditable(false);
+        this.txtLogDepuraciones.setEditable(false);
         this.textEdicionArchivo.setCaretColor(Color.BLACK);
+
+        //Apartado de ocultacion de modo depuracion
+        this.btnAvanzarDep.setVisible(false);
+        this.btnRetrocederDep.setVisible(false);
+        this.btnFinalizarDep.setVisible(false);
+        this.btnReiniciarDep.setVisible(false);
+        this.lblDepuracion.setVisible(false);
+
+        this.scrollModoDepuracion.setVisible(false);
+        this.txtLogDepuraciones.setText("");
 
         this.gestionVentanas = 0;
         this.yaCargado = false;
@@ -120,8 +124,6 @@ public class MenuPrincipal extends javax.swing.JFrame {
         });
     }
 
-    
-
     //===========================================APARTADO DE METODOS QUE SE UTILIZAN PARA DINAMIZAR LA UI===========================================
     //Metodo de UI que permite nombrar algo y no permite vacios
     private String pedirNombre(String mensaje) {
@@ -137,6 +139,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     }
 
     //Metodo que sirve para poder mostrar la seleccion de la busqueda de palabras
+    //2 modo depuracion
     //1 busqueda de palabras
     //0 reinicia la UI PRINCIPAL
     public void mostrarBusquedas() {
@@ -169,11 +172,13 @@ public class MenuPrincipal extends javax.swing.JFrame {
         labelMedio.cambiarLabel(iconoMedio);
         this.lblEleccionesDadas.setText("Modo Depuracion");
 
+        this.gestionVentanas = 2;
+
         this.btnBusquedaPatrones.setBackground(new Color(0x533F59));
         this.btnReporteErrores.setBackground(new Color(0x533F59));
         this.btnReporteTokens.setBackground(new Color(0x533F59));
         this.btnDepuracion.setBackground(new Color(0x4D6E4C));
-        modoDepuracion();
+        operarModoDepuracion();
 
     }
 
@@ -264,31 +269,60 @@ public class MenuPrincipal extends javax.swing.JFrame {
         this.btnGuardarArchivo.setText("Buscar Patron");
         this.btnQuitarArchivo.setEnabled(false);
         this.btnGuardarArchivo.setEnabled(true);
+        this.btnAvanzarDep.setVisible(false);
+        this.btnRetrocederDep.setVisible(false);
+        this.btnFinalizarDep.setVisible(false);
+        this.btnReiniciarDep.setVisible(false);
+        this.lblDepuracion.setVisible(false);
+        this.btnGuardarArchivo.setVisible(true);
+        this.lblAnalisis.setVisible(true);
+        this.lblMostrarError.setVisible(true);
+
+        //Scrolls del modo depuracion
+        this.scrollModoDepuracion.setVisible(false);
+        this.txtLogDepuraciones.setText("");
 
         this.txtBusquedas.requestFocusInWindow();
 
     }
 
-    //Metodo encargado de ejecutar el reporte de conteo de lexemas
     //Metodo que se utiliza para manejar todos los componentes y entrar en el modo depuracion del sistema
-    public void modoDepuracion() {
-        //Se despliega la ventana emergente para editar la configuracion
-        /* EditarConfiguracion dialog = new EditarConfiguracion(this, true, leerEntradas, textEdicionArchivo, textLogErrores);
-        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-            @Override
-            public void windowClosing(java.awt.event.WindowEvent e) {
+    public void operarModoDepuracion() {
 
-                if (gestionVentanas == 0) {
-                    regresarInicio();
-                }
+        this.textEdicionArchivo.setEditable(false);
+        this.btnAnalisis.setVisible(false);
+        this.scrollBusquedas.setVisible(false);
+        this.scrollTransiciones.setVisible(false);
+        this.txtBusquedas.setText("");
+        this.txtLogBusquedas.setText("");
 
-                if (gestionVentanas == 1) {
-                    mostrarBusquedas();
-                }
+        this.lblMostrarError.setVisible(false);
 
-            }
-        });
-        dialog.setVisible(true);*/
+        this.lblAnalisis.setVisible(false);
+        this.txtBusquedas.setVisible(false);
+        this.btnSubirArchivo.setEnabled(false);
+
+        this.btnQuitarArchivo.setEnabled(false);
+
+        this.btnGuardarArchivo.setVisible(false);
+
+        this.btnAvanzarDep.setVisible(true);
+        this.btnRetrocederDep.setVisible(true);
+        this.btnFinalizarDep.setVisible(true);
+        this.btnReiniciarDep.setVisible(true);
+        this.lblDepuracion.setVisible(true);
+
+        //Scroll que permite mostrar el vaje entre estados
+        this.scrollModoDepuracion.setVisible(true);
+        this.txtLogDepuraciones.setText("");
+
+        try {
+
+            this.leerEntradas.getLexerActual().obtenerModoDepuracion().reiniciarDepurador();
+
+        } catch (NullPointerException | ConfigException ex) {
+
+        }
 
     }
 
@@ -313,7 +347,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         dialog.setVisible(true);
 
     }
-    
+
     //Metodo que permite mostrar los reportes de lexemas/tokens
     public void operarReportesTokens() {
         //Se despliega la ventana emergente para La generacion de reportes
@@ -351,6 +385,19 @@ public class MenuPrincipal extends javax.swing.JFrame {
         this.btnSubirArchivo.setEnabled(true);
         this.btnGuardarArchivo.setText("Guardar Texto");
         this.btnQuitarArchivo.setEnabled(true);
+        this.btnAvanzarDep.setVisible(false);
+        this.btnRetrocederDep.setVisible(false);
+        this.btnFinalizarDep.setVisible(false);
+        this.btnReiniciarDep.setVisible(false);
+        this.lblDepuracion.setVisible(false);
+        this.lblAnalisis.setVisible(true);
+        this.lblDepuracion.setVisible(false);
+        this.btnGuardarArchivo.setVisible(true);
+
+        this.lblMostrarError.setVisible(true);
+
+        this.scrollModoDepuracion.setVisible(false);
+        this.txtLogDepuraciones.setText("");
 
         if (this.yaCargado) {
             this.btnGuardarArchivo.setEnabled(false);
@@ -395,6 +442,13 @@ public class MenuPrincipal extends javax.swing.JFrame {
         txtLogTransiciones = new javax.swing.JTextPane();
         scrollBusquedas = new javax.swing.JScrollPane();
         txtLogBusquedas = new javax.swing.JTextPane();
+        btnFinalizarDep = new javax.swing.JButton();
+        lblDepuracion = new javax.swing.JLabel();
+        btnReiniciarDep = new javax.swing.JButton();
+        btnRetrocederDep = new javax.swing.JButton();
+        btnAvanzarDep = new javax.swing.JButton();
+        scrollModoDepuracion = new javax.swing.JScrollPane();
+        txtLogDepuraciones = new javax.swing.JTextPane();
         barraLateral = new javax.swing.JPanel();
         btnBusquedaPatrones = new javax.swing.JButton();
         btnReporteErrores = new javax.swing.JButton();
@@ -535,11 +589,11 @@ public class MenuPrincipal extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(labelDatos, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
                 .addComponent(btnSubirArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btnQuitarArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(35, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -629,6 +683,74 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         jPanel2.add(scrollBusquedas);
         scrollBusquedas.setBounds(10, 140, 690, 430);
+
+        btnFinalizarDep.setBackground(new java.awt.Color(187, 41, 41));
+        btnFinalizarDep.setFont(new java.awt.Font("Liberation Sans", 1, 22)); // NOI18N
+        btnFinalizarDep.setForeground(new java.awt.Color(255, 255, 255));
+        btnFinalizarDep.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/pablocompany/proyectono1/recursosapp/images/avanzarFin.png"))); // NOI18N
+        btnFinalizarDep.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFinalizarDepActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnFinalizarDep);
+        btnFinalizarDep.setBounds(560, 50, 60, 50);
+
+        lblDepuracion.setFont(new java.awt.Font("Liberation Sans", 1, 26)); // NOI18N
+        lblDepuracion.setForeground(new java.awt.Color(83, 31, 11));
+        lblDepuracion.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblDepuracion.setText("Modo Depuracion:");
+        jPanel2.add(lblDepuracion);
+        lblDepuracion.setBounds(20, 10, 690, 30);
+
+        btnReiniciarDep.setBackground(new java.awt.Color(48, 148, 92));
+        btnReiniciarDep.setFont(new java.awt.Font("Liberation Sans", 1, 22)); // NOI18N
+        btnReiniciarDep.setForeground(new java.awt.Color(255, 255, 255));
+        btnReiniciarDep.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/pablocompany/proyectono1/recursosapp/images/resetIcon.png"))); // NOI18N
+        btnReiniciarDep.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReiniciarDepActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnReiniciarDep);
+        btnReiniciarDep.setBounds(110, 50, 60, 50);
+
+        btnRetrocederDep.setBackground(new java.awt.Color(112, 10, 201));
+        btnRetrocederDep.setFont(new java.awt.Font("Liberation Sans", 1, 22)); // NOI18N
+        btnRetrocederDep.setForeground(new java.awt.Color(255, 255, 255));
+        btnRetrocederDep.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/pablocompany/proyectono1/recursosapp/images/avanzarIzquiertaIcon.png"))); // NOI18N
+        btnRetrocederDep.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRetrocederDepActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnRetrocederDep);
+        btnRetrocederDep.setBounds(260, 50, 60, 50);
+
+        btnAvanzarDep.setBackground(new java.awt.Color(112, 10, 201));
+        btnAvanzarDep.setFont(new java.awt.Font("Liberation Sans", 1, 22)); // NOI18N
+        btnAvanzarDep.setForeground(new java.awt.Color(255, 255, 255));
+        btnAvanzarDep.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/pablocompany/proyectono1/recursosapp/images/avanzarDerechaIcon.png"))); // NOI18N
+        btnAvanzarDep.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAvanzarDepActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnAvanzarDep);
+        btnAvanzarDep.setBounds(410, 50, 60, 50);
+
+        txtLogDepuraciones.setBackground(new java.awt.Color(223, 221, 221));
+        txtLogDepuraciones.setFont(new java.awt.Font("Liberation Serif", 1, 20)); // NOI18N
+        txtLogDepuraciones.setForeground(new java.awt.Color(140, 1, 25));
+        txtLogDepuraciones.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtLogDepuracionesKeyReleased(evt);
+            }
+        });
+        scrollModoDepuracion.setViewportView(txtLogDepuraciones);
+
+        jPanel2.add(scrollModoDepuracion);
+        scrollModoDepuracion.setBounds(10, 140, 690, 430);
 
         barraLateral.setBackground(new java.awt.Color(45, 1, 61));
         barraLateral.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(0, 0, 0)));
@@ -1028,16 +1150,57 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
     }//GEN-LAST:event_textEdicionArchivoKeyPressed
 
+    private void btnFinalizarDepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFinalizarDepActionPerformed
+        //Boton que permite avanzar directamente hasta el ultimo estado
+    }//GEN-LAST:event_btnFinalizarDepActionPerformed
+
+    private void btnReiniciarDepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReiniciarDepActionPerformed
+        //Boton que permite reiniciar la depuracion en el lexema
+    }//GEN-LAST:event_btnReiniciarDepActionPerformed
+
+    private void btnRetrocederDepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRetrocederDepActionPerformed
+        // Boton que permite dar un paso atras en el analisis
+    }//GEN-LAST:event_btnRetrocederDepActionPerformed
+
+    private void btnAvanzarDepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAvanzarDepActionPerformed
+        // Boton que permite avanzar un paso adelante en el analisis
+        try {
+
+            if (this.leerEntradas == null) {
+                JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador\nEscribe algo para poderlo depurar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (this.leerEntradas.getLexerActual() == null) {
+                JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador para depurar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+        } catch (NullPointerException ex) {
+            JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador\nEscribe algo para poderlo depurar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+
+        }
+
+    }//GEN-LAST:event_btnAvanzarDepActionPerformed
+
+    private void txtLogDepuracionesKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtLogDepuracionesKeyReleased
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtLogDepuracionesKeyReleased
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel barraLateral;
     private javax.swing.JButton btnAnalisis;
+    private javax.swing.JButton btnAvanzarDep;
     private javax.swing.JButton btnBusquedaPatrones;
     private javax.swing.JButton btnDepuracion;
+    private javax.swing.JButton btnFinalizarDep;
     private javax.swing.JButton btnGuardarArchivo;
     private javax.swing.JButton btnQuitarArchivo;
+    private javax.swing.JButton btnReiniciarDep;
     private javax.swing.JButton btnReporteErrores;
     private javax.swing.JButton btnReporteTokens;
+    private javax.swing.JButton btnRetrocederDep;
     private javax.swing.JButton btnSubirArchivo;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -1047,6 +1210,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel labelOperaciones1;
     private javax.swing.JLabel lblAdmin;
     private javax.swing.JLabel lblAnalisis;
+    private javax.swing.JLabel lblDepuracion;
     private javax.swing.JLabel lblEleccion;
     private javax.swing.JLabel lblEleccionesDadas;
     private javax.swing.JLabel lblErroresEncontrados;
@@ -1059,12 +1223,14 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private javax.swing.JScrollPane scrollAreaEdicion;
     private javax.swing.JScrollPane scrollBusquedas;
     private javax.swing.JScrollPane scrollErroresLog;
+    private javax.swing.JScrollPane scrollModoDepuracion;
     private javax.swing.JScrollPane scrollTransiciones;
     private javax.swing.JTextPane textEdicionArchivo;
     private javax.swing.JTextPane textLogErrores;
     private javax.swing.JTextArea txtAreaDirectorioArchivo;
     private javax.swing.JTextField txtBusquedas;
     private javax.swing.JTextPane txtLogBusquedas;
+    private javax.swing.JTextPane txtLogDepuraciones;
     private javax.swing.JTextPane txtLogTransiciones;
     // End of variables declaration//GEN-END:variables
 }
