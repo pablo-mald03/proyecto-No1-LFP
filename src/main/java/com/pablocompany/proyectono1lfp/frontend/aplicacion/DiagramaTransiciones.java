@@ -9,6 +9,7 @@ import com.pablocompany.proyectono1lfp.backend.analizadorlexicorecursos.Automata
 import com.pablocompany.proyectono1lfp.backend.aplicacion.ColocarFondos;
 import java.awt.BorderLayout;
 import javax.swing.JDialog;
+import javax.swing.JScrollPane;
 
 /**
  *
@@ -16,7 +17,6 @@ import javax.swing.JDialog;
  */
 public class DiagramaTransiciones extends javax.swing.JDialog {
 
-    
     public DiagramaTransiciones(JDialog parent, boolean modal, Lexema lexemaRecibido) {
         super(parent, modal);
         initComponents();
@@ -27,12 +27,18 @@ public class DiagramaTransiciones extends javax.swing.JDialog {
 
         //Clase encargada de ilustrar los movimientos del automata
         AutomataPanel automataPanel = new AutomataPanel(lexemaRecibido);
-        
+
         this.lblLexema.setText("Lexema: " + lexemaRecibido.getLexema());
 
+        JScrollPane scroll = new JScrollPane(automataPanel,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        
         this.panelTransiciones.setLayout(new BorderLayout());
-        this.panelTransiciones.add(automataPanel, BorderLayout.CENTER);
+        this.panelTransiciones.removeAll(); 
+        this.panelTransiciones.add(scroll, BorderLayout.CENTER);
         this.panelTransiciones.revalidate();
+        this.panelTransiciones.repaint();
 
     }
 

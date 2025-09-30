@@ -7,6 +7,9 @@ package com.pablocompany.proyectono1lfp.backend.analizadorlexicorecursos;
 import com.pablocompany.proyectono1lfp.backend.analizadorlexico.Lexema;
 import com.pablocompany.proyectono1lfp.backend.analizadorlexico.Nodo;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -27,6 +30,14 @@ public class AutomataPanel extends JPanel {
         setBackground(Color.WHITE);
     }
 
+    @Override
+    public Dimension getPreferredSize() {
+        int total = lexemaAutomata.getLongitudNodo();
+        int ancho = 180 * total;
+        int alto = 300;
+        return new Dimension(ancho, alto);
+    }
+
     //Metodo que sirve para poder dibujar las transiciones del automata con el lexema
     @Override
     protected void paintComponent(Graphics g) {
@@ -35,48 +46,77 @@ public class AutomataPanel extends JPanel {
 
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        int x = 100;   
+        int x = 100;
         int y = 100;
-        int radio = 40;
+        int radio = 80; // 🔹 ahora más grande
 
         int total = this.lexemaAutomata.getLongitudNodo();
 
-        //Tirangulito de estado inicial jeje
-        int[] tx = {x - 50, x - 20, x - 20};
+        // Tirangulito de estado inicial
+        int[] tx = {x - 20, x - 50, x - 50};
         int[] ty = {y + radio / 2, y + radio / 2 - 10, y + radio / 2 + 10};
         g2d.fillPolygon(tx, ty, 3);
 
+        // 🔹 Fuente más grande
+        g2d.setFont(new Font("Liberation Sans", Font.BOLD, 20));
+        FontMetrics fm = g2d.getFontMetrics();
+
+        int numeroEstado = 0;
         for (int i = 0; i < total; i++) {
             Nodo nodoUbicado = this.lexemaAutomata.getValorNodo(i);
 
-        
+            // Dibuja el estado
             g2d.drawOval(x, y, radio, radio);
-            g2d.drawString("q" + i, x + 15, y + 25);
 
-            
-            if (i == total - 1) {
-                g2d.drawOval(x - 3, y - 3, radio + 6, radio + 6);
-            }
+            // Texto centrado en la bolita
+            String textoEstado = "q" + i;
+            int textWidth = fm.stringWidth(textoEstado);
+            int textHeight = fm.getAscent();
+            int textX = x + (radio - textWidth) / 2;
+            int textY = y + (radio + textHeight) / 2 - 5;
+            g2d.drawString(textoEstado, textX, textY);
 
             // 🔹 Dibujar transición si no es el último
-            if (i < total - 1) {
-                int nextX = x + 100;
+            if (i < total) {
+                int nextX = x + 150;
 
-                //Se dibuja una linea recta 
+                // Línea recta
                 g2d.drawLine(x + radio, y + radio / 2, nextX, y + radio / 2);
 
-                //Le agrega la flechita para que se vea como transicion
+                // Flechita
                 int[] px = {nextX, nextX - 10, nextX - 10};
                 int[] py = {y + radio / 2, y + radio / 2 - 5, y + radio / 2 + 5};
                 g2d.fillPolygon(px, py, 3);
 
+                // Etiqueta de transición centrada
+                String trans = String.valueOf(nodoUbicado.getCaracter());
                 
-                g2d.drawString(String.valueOf(nodoUbicado.getCaracter()),
-                        x + (nextX - x) / 2,
-                        y + radio / 2 - 10);
+                if(trans.isBlank()){
+                    trans = "\'  \'";
+                }
+ 
+                int transWidth = fm.stringWidth(trans);
+                int midX = x + radio + ((nextX - (x + radio)) / 2);
+                g2d.drawString(trans, midX - transWidth / 2, y + radio / 2 - 10);
             }
 
-            x += 100; 
+            x += 150;
+
+            numeroEstado = i;
         }
+      
+        g2d.drawOval(x, y, radio, radio);
+
+    
+        String textoEstado = "q" + (numeroEstado + 1);
+        int textWidth = fm.stringWidth(textoEstado);
+        int textHeight = fm.getAscent();
+        int textX = x + (radio - textWidth) / 2;
+        int textY = y + (radio + textHeight) / 2 - 5;
+        g2d.drawString(textoEstado, textX, textY);
+        
+        g2d.drawOval(x - 3, y - 3, radio + 7, radio + 7);
+
     }
+    
 }

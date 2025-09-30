@@ -226,6 +226,8 @@ public class AnalizadorLexico {
             lexemaActual.generalizarNodo(TokenEnum.ERROR);
             lexemaActual.setYaDeclarado(true);
             ilustrarEstadosAutomata(lexemaActual);
+            lexemaActual.setLexemaError("palabra reservada mal escrita ");
+            lexemaActual.setCadenaEsperada("Se esperaba la palabra reservada " + palabraSugerida);
             recomendarPalabra(this.areaAnalisis, lexemaActual, palabraSugerida);
             return true;
         }
