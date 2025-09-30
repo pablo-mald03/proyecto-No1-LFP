@@ -4,6 +4,7 @@
  */
 package com.pablocompany.proyectono1lfp.frontend.aplicacion;
 
+import com.pablocompany.proyectono1lfp.backend.analizadorlexico.Lexema;
 import com.pablocompany.proyectono1lfp.backend.analizadorlexicorecursos.LectorEntradas;
 import com.pablocompany.proyectono1lfp.backend.aplicacion.ColocarFondos;
 import com.pablocompany.proyectono1lfp.backend.aplicacion.CrearTableros;
@@ -12,6 +13,7 @@ import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorPuntualException
 import java.awt.Color;
 import javax.swing.JOptionPane;
 import javax.swing.JViewport;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -23,7 +25,7 @@ public class ReporteLexemas extends javax.swing.JDialog {
      * Creates new form MostrarReportes
      */
     private LectorEntradas gestionLecturas;
-    
+
     //Gestiona el reporte de conteo lexemas
     private ModificarTabla mdTablitaConteo;
     private CrearTableros crearTableroConteo;
@@ -31,6 +33,9 @@ public class ReporteLexemas extends javax.swing.JDialog {
     //Gestiona el reporte de tokenizacion de lexemas
     private ModificarTabla mdTablitaTokenizacion;
     private CrearTableros crearTableroTokenizacion;
+
+    //Atributo que permite pasar por parametro el lexema seleccionado para graficar sus transiciones
+    private Lexema lexemaSeleccionado;
 
     public ReporteLexemas(java.awt.Frame parent, boolean modal, LectorEntradas gestorLecturas) {
         super(parent, modal);
@@ -44,9 +49,9 @@ public class ReporteLexemas extends javax.swing.JDialog {
 
         pintarPanel.pintarDialog("/com/pablocompany/proyectono1/recursosapp/images/overlay2.png");
 
-
         this.gestionLecturas = gestorLecturas;
 
+        this.lexemaSeleccionado = null;
 
         this.mdTablitaConteo = new ModificarTabla(this.tableroConteoLexermas);
         this.crearTableroConteo = new CrearTableros(this.tableroConteoLexermas);
@@ -54,8 +59,36 @@ public class ReporteLexemas extends javax.swing.JDialog {
         this.mdTablitaTokenizacion = new ModificarTabla(this.tableroConteoTokens);
         this.crearTableroTokenizacion = new CrearTableros(this.tableroConteoTokens);
 
+        this.textFieldToken.setEditable(false);
+        this.textFieldCadena.setEditable(false);
+
         this.gestionLecturas.getGenerarReportes().reiniciarListas();
 
+    }
+
+    //Metodo que sirve para mandar a llamar la graficacion de los estados del automata
+    public void ilustrarTransiciones() {
+        //Se despliega la ventana emergente para La generacion de reportes
+        DiagramaTransiciones dialog = new DiagramaTransiciones(this, true, lexemaSeleccionado);
+        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+
+            }
+        });
+        dialog.setVisible(true);
+
+    }
+
+    //Metodo que permite ilustrar el lexema encontrado
+    private void marcarSeleccionLexemas() {
+        if (this.lexemaSeleccionado == null) {
+            return;
+        }
+
+        this.textFieldCadena.setText(this.lexemaSeleccionado.getLexema());
+
+        this.textFieldToken.setText(this.lexemaSeleccionado.getEstadoAnalisis().getTipo());
     }
 
     /**
@@ -79,6 +112,13 @@ public class ReporteLexemas extends javax.swing.JDialog {
         jScrollTablero2 = new javax.swing.JScrollPane();
         tableroConteoTokens = new javax.swing.JTable();
         btnReportarToken = new javax.swing.JButton();
+        panelErroes3 = new javax.swing.JPanel();
+        lblAnalisis3 = new javax.swing.JLabel();
+        textFieldCadena = new javax.swing.JTextField();
+        lblAnalisis4 = new javax.swing.JLabel();
+        textFieldToken = new javax.swing.JTextField();
+        lblAnalisis5 = new javax.swing.JLabel();
+        btnGenerarDiagrama = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Visualizacion de Reportes");
@@ -204,7 +244,7 @@ public class ReporteLexemas extends javax.swing.JDialog {
                                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelErroes2Layout.createSequentialGroup()
                                         .addGap(49, 49, 49)
                                         .addComponent(lblConteoLexemas1, javax.swing.GroupLayout.PREFERRED_SIZE, 604, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                        .addGap(0, 16, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(panelErroes2Layout.createSequentialGroup()
                         .addGap(177, 177, 177)
                         .addComponent(btnReporteConteo, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -232,6 +272,87 @@ public class ReporteLexemas extends javax.swing.JDialog {
                 .addContainerGap())
         );
 
+        panelErroes3.setBackground(new java.awt.Color(111, 156, 209));
+        panelErroes3.setBorder(javax.swing.BorderFactory.createMatteBorder(5, 5, 5, 5, new java.awt.Color(50, 56, 68)));
+
+        lblAnalisis3.setFont(new java.awt.Font("Liberation Sans", 1, 28)); // NOI18N
+        lblAnalisis3.setForeground(new java.awt.Color(158, 13, 63));
+        lblAnalisis3.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        lblAnalisis3.setText("Lexema Seleccionado:");
+
+        textFieldCadena.setBackground(new java.awt.Color(255, 255, 255));
+        textFieldCadena.setFont(new java.awt.Font("Liberation Sans", 0, 24)); // NOI18N
+        textFieldCadena.setForeground(new java.awt.Color(0, 0, 0));
+
+        lblAnalisis4.setFont(new java.awt.Font("Liberation Sans", 1, 28)); // NOI18N
+        lblAnalisis4.setForeground(new java.awt.Color(8, 100, 20));
+        lblAnalisis4.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        lblAnalisis4.setText("Lexema:");
+
+        textFieldToken.setBackground(new java.awt.Color(255, 255, 255));
+        textFieldToken.setFont(new java.awt.Font("Liberation Sans", 0, 24)); // NOI18N
+        textFieldToken.setForeground(new java.awt.Color(0, 0, 0));
+
+        lblAnalisis5.setFont(new java.awt.Font("Liberation Sans", 1, 28)); // NOI18N
+        lblAnalisis5.setForeground(new java.awt.Color(8, 100, 20));
+        lblAnalisis5.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        lblAnalisis5.setText("Token:");
+
+        btnGenerarDiagrama.setBackground(new java.awt.Color(57, 7, 96));
+        btnGenerarDiagrama.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
+        btnGenerarDiagrama.setForeground(new java.awt.Color(229, 227, 227));
+        btnGenerarDiagrama.setText("Generar Diagrama");
+        btnGenerarDiagrama.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGenerarDiagramaActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout panelErroes3Layout = new javax.swing.GroupLayout(panelErroes3);
+        panelErroes3.setLayout(panelErroes3Layout);
+        panelErroes3Layout.setHorizontalGroup(
+            panelErroes3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelErroes3Layout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addGroup(panelErroes3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelErroes3Layout.createSequentialGroup()
+                        .addComponent(lblAnalisis3, javax.swing.GroupLayout.PREFERRED_SIZE, 568, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(panelErroes3Layout.createSequentialGroup()
+                        .addGroup(panelErroes3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(panelErroes3Layout.createSequentialGroup()
+                                .addComponent(lblAnalisis5, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(27, 27, 27)
+                                .addComponent(textFieldToken))
+                            .addGroup(panelErroes3Layout.createSequentialGroup()
+                                .addComponent(lblAnalisis4, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(27, 27, 27)
+                                .addComponent(textFieldCadena, javax.swing.GroupLayout.PREFERRED_SIZE, 265, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnGenerarDiagrama, javax.swing.GroupLayout.PREFERRED_SIZE, 243, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(199, 199, 199))))
+        );
+        panelErroes3Layout.setVerticalGroup(
+            panelErroes3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelErroes3Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblAnalisis3)
+                .addGroup(panelErroes3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelErroes3Layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addGroup(panelErroes3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(textFieldCadena, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblAnalisis4)))
+                    .addGroup(panelErroes3Layout.createSequentialGroup()
+                        .addGap(21, 21, 21)
+                        .addComponent(btnGenerarDiagrama, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelErroes3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(textFieldToken, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblAnalisis5))
+                .addGap(267, 267, 267))
+        );
+
         javax.swing.GroupLayout panelPrincipalLayout = new javax.swing.GroupLayout(panelPrincipal);
         panelPrincipal.setLayout(panelPrincipalLayout);
         panelPrincipalLayout.setHorizontalGroup(
@@ -240,8 +361,9 @@ public class ReporteLexemas extends javax.swing.JDialog {
                 .addGap(34, 34, 34)
                 .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(panelErroes2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblReportes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(33, Short.MAX_VALUE))
+                    .addComponent(lblReportes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelErroes3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(49, Short.MAX_VALUE))
         );
         panelPrincipalLayout.setVerticalGroup(
             panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -250,7 +372,9 @@ public class ReporteLexemas extends javax.swing.JDialog {
                 .addComponent(lblReportes)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelErroes2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(305, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(panelErroes3, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(25, Short.MAX_VALUE))
         );
 
         getContentPane().add(panelPrincipal, java.awt.BorderLayout.CENTER);
@@ -259,7 +383,42 @@ public class ReporteLexemas extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void tableroConteoLexermasMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableroConteoLexermasMousePressed
-        // TODO add your handling code here:
+
+        //Metodo que permite ubicar el lexema en el indice 
+        try {
+
+            int fila = this.tableroConteoLexermas.rowAtPoint(evt.getPoint());
+            int columna = this.tableroConteoLexermas.columnAtPoint(evt.getPoint());
+
+            if (fila > -1 && columna > -1) {
+
+                if (SwingUtilities.isLeftMouseButton(evt)) {
+
+                    if (this.gestionLecturas == null) {
+                        JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador\nEscribe algo para poderlo analizar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    if (this.gestionLecturas.getGenerarReportes().reporteLexemasGenerado()) {
+                        JOptionPane.showMessageDialog(this, "No se ha generado el reporte de lexemas\nPresione el boton en el \"Reporte Tokens Lexemas\"", "Reporte de lexemas no generado aun", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    if (this.gestionLecturas.getGenerarReportes().esVaciaListaLexemas()) {
+                        JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador\nEscribe algo para poderlo analizar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    this.lexemaSeleccionado = this.gestionLecturas.getGenerarReportes().getLexemaSeleccionado(fila);
+                    marcarSeleccionLexemas();
+
+                }
+            }
+
+        } catch (NullPointerException ex) {
+            JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador\nEscribe algo para poderlo analizar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+
+        }
     }//GEN-LAST:event_tableroConteoLexermasMousePressed
 
     private void btnReporteConteoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReporteConteoActionPerformed
@@ -322,22 +481,40 @@ public class ReporteLexemas extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btnReportarTokenActionPerformed
 
+    private void btnGenerarDiagramaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarDiagramaActionPerformed
+        //Permite generar la ilustracion del AFD
+
+        if (this.lexemaSeleccionado == null) {
+            JOptionPane.showMessageDialog(this, "Token no seleccionado \nDa click sobre el lexema que desees ver en el \"Reporte de Tokens Lexemas\"", "Lexema no Seleccionado", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        ilustrarTransiciones();
+    }//GEN-LAST:event_btnGenerarDiagramaActionPerformed
+
     /**
      * @param args the command line arguments
      */
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnGenerarDiagrama;
     private javax.swing.JButton btnReportarToken;
     private javax.swing.JButton btnReporteConteo;
     private javax.swing.JScrollPane jScrollTablero1;
     private javax.swing.JScrollPane jScrollTablero2;
     private javax.swing.JLabel lblAnalisis2;
+    private javax.swing.JLabel lblAnalisis3;
+    private javax.swing.JLabel lblAnalisis4;
+    private javax.swing.JLabel lblAnalisis5;
     private javax.swing.JLabel lblConteoLexemas;
     private javax.swing.JLabel lblConteoLexemas1;
     private javax.swing.JLabel lblReportes;
     private javax.swing.JPanel panelErroes2;
+    private javax.swing.JPanel panelErroes3;
     private javax.swing.JPanel panelPrincipal;
     private javax.swing.JTable tableroConteoLexermas;
     private javax.swing.JTable tableroConteoTokens;
+    private javax.swing.JTextField textFieldCadena;
+    private javax.swing.JTextField textFieldToken;
     // End of variables declaration//GEN-END:variables
 }

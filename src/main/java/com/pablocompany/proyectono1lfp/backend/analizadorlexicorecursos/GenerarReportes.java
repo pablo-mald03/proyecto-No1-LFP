@@ -48,6 +48,9 @@ public class GenerarReportes {
     //Listado de tokens
     private ArrayList<String> listadoTokens = new ArrayList<>(2000);
 
+    //Listado que permite guardar los lexemas para poder generar transiciones
+    private ArrayList<Lexema> listadoLexemasSentencia = new ArrayList<>(2000);
+
     //------------------FIN DEL APARTADO DE MANEJO DE ATRIBUTOS DEL REPORTE--------------
     public GenerarReportes() {
 
@@ -137,6 +140,8 @@ public class GenerarReportes {
             throw new ErrorPuntualException("No se ha encontrado ningun lexema ");
         }
 
+        cargarSentenciasLexema(sentenciasListado);
+
         String[] titulos = {"Nombre Token", "Lexema", "Posicion"};
         crearTablero.tableroConTitulo(titulos, this.listadoLexemas.size() / 3, 3, true);
         modificarTabla.reendereizarTablero();
@@ -157,6 +162,41 @@ public class GenerarReportes {
 
     }
 
+    //Submetodo que se carga al generar el reporte de Lexemas para poder generar las transiciones del afd
+    public void cargarSentenciasLexema(ArrayList<Sentencia> sentenciasListado) {
+
+        if (!this.listadoLexemasSentencia.isEmpty()) {
+            this.listadoLexemasSentencia.clear();
+        }
+
+        for (Sentencia sentencia : sentenciasListado) {
+
+            for (int i = 0; i < sentencia.limiteLexemas(); i++) {
+
+                Lexema lexemaEvaluado = sentencia.getListaLexema(i);
+
+                if (!lexemaEvaluado.getLexema().isBlank()) {
+
+                    this.listadoLexemasSentencia.add(lexemaEvaluado);
+
+                }
+
+            }
+
+        }
+
+    }
+
+    //Metodo que permite saber si la lista de lexemas de las sentencias esta vacia
+    public boolean esVaciaListaLexemas() {
+        return this.listadoLexemasSentencia.isEmpty();
+    }
+
+    //Metodo que retorna la referencia viva del lexema
+    public Lexema getLexemaSeleccionado(int indice) {
+        return this.listadoLexemasSentencia.get(indice);
+    }
+
     //Metodo util para reiniciar todas las listas al entrar
     public void reiniciarListas() {
         if (!this.listadoLexemas.isEmpty()) {
@@ -169,6 +209,16 @@ public class GenerarReportes {
         if (!this.listadoTokens.isEmpty()) {
             this.listadoTokens.clear();
         }
+
+        if (!this.listadoLexemasSentencia.isEmpty()) {
+            this.listadoLexemasSentencia.clear();
+        }
+    }
+    
+    
+    //Metodo que permite saber si el reporte esta generado o no
+    public boolean reporteLexemasGenerado(){
+        return this.listadoLexemas.isEmpty();
     }
 
     //Metodo util para poder mostrar los conteos de lexemas las veces que aparecen
@@ -350,10 +400,10 @@ public class GenerarReportes {
 
                     }
 
-                    coordenada += "Columna "+String.valueOf(columnaTope) + "]\"";
+                    coordenada += "Columna " + String.valueOf(columnaTope) + "]\"";
 
                     this.listaErrores.add(coordenada);
-                    
+
                     this.listaErrores.add(lexemaEvaluado.getCadenaEsperada());
 
                 }
@@ -366,7 +416,7 @@ public class GenerarReportes {
             throw new ErrorPuntualException("No se han encontrado errores");
         }
 
-        String[] titulos = {"Cadena de Error", "Posicion","Descripcion"};
+        String[] titulos = {"Cadena de Error", "Posicion", "Descripcion"};
         crearTablero.tableroConTitulo(titulos, this.listaErrores.size() / 3, 3, true);
         modificarTabla.reendereizarTablero();
 
@@ -393,7 +443,7 @@ public class GenerarReportes {
 
     //Metodo que permite comunicar a la UI con la interaccion para generar reporte de errores
     public void generarReporteSinErroresTokens() throws ErrorPuntualException {
-        
+
         //PENDIENTE TRABAJAR EN ESTO
         if (this.listadoTokens.isEmpty()) {
             throw new ErrorPuntualException("No hay reporte de Cantidad de Tokens cargado aun\nGenere primero el reporte para poder exportarlo");
