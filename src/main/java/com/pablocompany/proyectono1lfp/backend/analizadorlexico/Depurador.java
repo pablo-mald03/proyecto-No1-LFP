@@ -50,6 +50,12 @@ public class Depurador {
     //Atributo que permite evaluar cuando se ha regresado por completo el analisis al estado inicial
     private boolean estaReiniciado;
 
+    //Atributo que indica si ya esta avanzado un paso
+    private boolean estaAvanzado;
+
+    //Atributo que indica si se ha adelantado el analisis hasta el final
+    private boolean estaOmitido;
+
     public Depurador(ArrayList<Sentencia> listaSentencias) {
         this.indiceSentencia = 0;
         this.indiceLexema = 0;
@@ -60,6 +66,8 @@ public class Depurador {
 
         this.estaDecrementado = false;
         this.estaReiniciado = false;
+        this.estaAvanzado = false;
+        this.estaOmitido = false;
     }
 
     //Metodo que permite reniciar el depurador cuando se abandona el analisis
@@ -67,6 +75,12 @@ public class Depurador {
         this.indiceSentencia = 0;
         this.indiceLexema = 0;
         this.indiceNodo = 0;
+        this.yaTerminado = false;
+        this.depuracionTerminada = false;
+        this.estaDecrementado = false;
+        this.estaReiniciado = false;
+        this.estaAvanzado = false;
+        this.estaOmitido = false;
     }
 
     //Metodo que ayuda a establecer el pane de depuracion
@@ -97,14 +111,33 @@ public class Depurador {
             return;
         }
 
+        if (this.estaOmitido) {
+            incrementarPaso();
+            this.estaOmitido = false;
+
+            if (this.estaDecrementado) {
+                this.estaDecrementado = false;
+            }
+
+        }
+
         if (this.estaDecrementado) {
             incrementarPaso();
             this.estaDecrementado = false;
+
+            if (estaReiniciado) {
+                this.estaReiniciado = false;
+            }
         }
 
         if (this.estaReiniciado) {
             incrementarPaso();
             this.estaReiniciado = false;
+
+        }
+
+        if (!this.estaAvanzado) {
+            this.estaAvanzado = true;
         }
 
         if (this.listaSentencias.get(this.indiceSentencia).getListaLexema(this.indiceLexema).getLexema().isBlank()) {
@@ -160,7 +193,33 @@ public class Depurador {
             this.estaDecrementado = true;
         }
 
-        decrementarPaso();
+        boolean fueAfectado = false;
+
+        if (this.estaOmitido) {
+            decrementarPaso();
+            this.estaOmitido = false;
+
+            if (this.estaAvanzado) {
+                this.estaAvanzado = false;
+            }
+
+            fueAfectado = true;
+
+        }
+
+        if (this.estaAvanzado) {
+            decrementarPaso();
+            this.estaAvanzado = false;
+
+            if (this.estaOmitido) {
+                this.estaOmitido = false;
+            }
+           
+        }
+
+        if (!fueAfectado) {
+            decrementarPaso();
+        }
 
         if (this.listaSentencias.get(this.indiceSentencia).getListaLexema(this.indiceLexema).getLexema().isBlank()) {
             decrementarPaso();
@@ -227,6 +286,16 @@ public class Depurador {
         if (!verificarListados()) {
             throw new DepuradorException("No hay ningun lexema escrito");
         }
+
+        Lexema lexemaEvaluado = this.listaSentencias.get(this.indiceSentencia).getListaLexema(this.indiceLexema);
+
+        this.indiceNodo = lexemaEvaluado.getLongitudNodo() - 1;
+
+        if (!this.estaOmitido) {
+            this.estaOmitido = true;
+        }
+
+        ilustrarEstadosAutomata();
 
     }
 
