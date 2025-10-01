@@ -214,7 +214,8 @@ public class Depurador {
             if (this.estaOmitido) {
                 this.estaOmitido = false;
             }
-           
+            fueAfectado = true; 
+
         }
 
         if (!fueAfectado) {
@@ -350,6 +351,34 @@ public class Depurador {
 
             Color colorEstados = new Color(0x0085A6);
 
+            //PENDIENTE FINALIZAR LO DE LA DETECCION DE ERRORES
+            TokenEnum tokenLexema = lexemaEvaluado.getEstadoAnalisis();
+
+            boolean buscarError = false;
+            //True representara que tiene error y lo buscara
+
+            if (tokenLexema == TokenEnum.ERROR) {
+                buscarError = true;
+            }
+
+            TokenEnum tokenVariado = lexemaEvaluado.verificarTokenReconocido();
+
+            boolean hayVarianza = false;
+            //True si detecta que hay un nodo con diferente token (Error pero tokenizado)
+
+            if (tokenVariado != TokenEnum.ERROR) {
+                hayVarianza = true;
+            }
+
+            int indiceError = 0;
+
+            //Flag que solo se activa cuando se llego realmente al indice de error 
+            boolean estadoError = false;
+
+            if (hayVarianza && buscarError) {
+                indiceError = calcularIndiceError(lexemaEvaluado, hayVarianza, buscarError);
+            }
+
             for (int i = 0; i <= this.indiceNodo; i++) {
 
                 Nodo nodoEvaluado = lexemaEvaluado.getValorNodo(i);
@@ -360,6 +389,12 @@ public class Depurador {
 
                 } else {
                     this.lexemaOperado.append("\'  \'");
+                }
+
+                //Ciclo que rompe si en dado caso se tiene un lexema de error y luego un token
+                if (hayVarianza && buscarError && indiceError != -1 && indiceError == i) {
+                    estadoError = true;
+                    break;
                 }
 
             }
@@ -381,17 +416,73 @@ public class Depurador {
 
             insertarEstadoTransicion("\n", Color.BLACK, this.paneDepuracion);
 
-            insertarEstadoTransicion("Lexema formado: ", new Color(0x61053B), this.paneDepuracion);
+            if (hayVarianza && buscarError && estadoError) {
+                insertarEstadoTransicion("Lexema de error: ", new Color(0x61053B), this.paneDepuracion);
+
+            } else {
+                insertarEstadoTransicion("Lexema formado: ", new Color(0x61053B), this.paneDepuracion);
+            }
 
             insertarEstadoTransicion(String.valueOf(this.lexemaOperado.toString()), Color.BLACK, this.paneDepuracion);
 
             insertarEstadoTransicion("\n", Color.BLACK, this.paneDepuracion);
+
+            //Se anunca el lexema de error
+            if (hayVarianza && buscarError && estadoError) {
+
+                insertarEstadoTransicion("No se ha llegado al estado de aceptacion", new Color(0xC22104), this.paneDepuracion);
+                insertarEstadoTransicion("\n", Color.BLACK, this.paneDepuracion);
+
+                insertarEstadoTransicion("Moviendo al estado de Error con la cadena: ", new Color(0xC22104), this.paneDepuracion);
+                insertarEstadoTransicion(String.valueOf(this.lexemaOperado.toString()), new Color(0x292724), this.paneDepuracion);
+                insertarEstadoTransicion("\n", Color.BLACK, this.paneDepuracion);
+                insertarEstadoTransicion("Reiniciando Automata...\n", Color.BLACK, this.paneDepuracion);
+
+                for (int i = indiceError + 1; i <= this.indiceNodo; i++) {
+
+                    Nodo nodoEvaluado = lexemaEvaluado.getValorNodo(i);
+
+                    if (!String.valueOf(nodoEvaluado.getCaracter()).isEmpty()) {
+
+                        this.lexemaOperado.append(nodoEvaluado.getCaracter());
+
+                    } else {
+                        this.lexemaOperado.append("\'  \'");
+                    }
+
+                }
+
+                insertarEstadoTransicion("Estado Actual: " + (estadoActual + 1), colorEstados, this.paneDepuracion);
+                insertarEstadoTransicion("\n", Color.BLACK, this.paneDepuracion);
+
+                insertarEstadoTransicion("Transita al estado " + (estadoActual + 2) + " con: " + valorTransicionado, colorEstados, this.paneDepuracion);
+
+                insertarEstadoTransicion("\n", Color.BLACK, this.paneDepuracion);
+
+                insertarEstadoTransicion("Lexema formado: ", new Color(0x61053B), this.paneDepuracion);
+
+                insertarEstadoTransicion(String.valueOf(this.lexemaOperado.toString()), Color.BLACK, this.paneDepuracion);
+
+                insertarEstadoTransicion("\n", Color.BLACK, this.paneDepuracion);
+
+            }
 
             if (lexemaEvaluado.getLongitudNodo() - 1 == estadoActual) {
                 this.yaTerminado = true;
             }
 
             if (this.yaTerminado) {
+
+                if (buscarError) {
+
+                    insertarEstadoTransicion("No se ha llegado al estado de aceptacion", new Color(0xC22104), this.paneDepuracion);
+                    insertarEstadoTransicion("\n", Color.BLACK, this.paneDepuracion);
+
+                    insertarEstadoTransicion("Moviendo al estado de Error con la cadena: ", new Color(0xC22104), this.paneDepuracion);
+                    insertarEstadoTransicion(String.valueOf(this.lexemaOperado.toString()), new Color(0x292724), this.paneDepuracion);
+                    insertarEstadoTransicion("\n", Color.BLACK, this.paneDepuracion);
+                    insertarEstadoTransicion("...\n", Color.BLACK, this.paneDepuracion);
+                }
 
                 insertarEstadoTransicion("Tipo de Token: ", new Color(0x0A8269), this.paneDepuracion);
                 insertarEstadoTransicion(lexemaEvaluado.getEstadoAnalisis().getTipo(), colorTexto, this.paneDepuracion);
@@ -417,6 +508,22 @@ public class Depurador {
             System.out.println("No se ha podido pintar el log de transiciones");
         }
 
+    }
+
+    //Sumbetodo que permite calcular el indice de error si lo hay
+    private int calcularIndiceError(Lexema lexemaEvaluado, boolean hayVarianza, boolean buscarError) {
+
+        for (int i = 0; i <= this.indiceNodo; i++) {
+
+            Nodo nodoEvaluado = lexemaEvaluado.getValorNodo(i);
+            //Ciclo que rompe si en dado caso se tiene un lexema de error y luego un token
+            if (hayVarianza && buscarError && nodoEvaluado.getToken() != TokenEnum.ERROR) {
+                return i - 1;
+            }
+
+        }
+
+        return -1;
     }
 
     // Método para insertar texto con un color específico
