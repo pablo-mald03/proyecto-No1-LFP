@@ -12,6 +12,7 @@ import com.pablocompany.proyectono1lfp.backend.aplicacion.EditorTexto;
 import com.pablocompany.proyectono1lfp.backend.aplicacion.IlustrarLabels;
 import com.pablocompany.proyectono1lfp.backend.excepciones.AnalizadorLexicoException;
 import com.pablocompany.proyectono1lfp.backend.excepciones.ConfigException;
+import com.pablocompany.proyectono1lfp.backend.excepciones.DepuradorException;
 import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorEncontradoException;
 import com.pablocompany.proyectono1lfp.backend.excepciones.ErrorPuntualException;
 import java.awt.Color;
@@ -1175,6 +1176,8 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         } catch (ConfigException ex1) {
              JOptionPane.showMessageDialog(this, ex1.getMessage(), "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+        }catch (DepuradorException ex2) {
+             JOptionPane.showMessageDialog(this, ex2.getMessage(), "Texto sin lexemas", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnFinalizarDepActionPerformed
 
@@ -1199,6 +1202,8 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         } catch (ConfigException ex1) {
              JOptionPane.showMessageDialog(this, ex1.getMessage(), "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+        } catch (DepuradorException ex2) {
+             JOptionPane.showMessageDialog(this, ex2.getMessage(), "Texto sin lexemas", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnReiniciarDepActionPerformed
 
@@ -1223,6 +1228,8 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         } catch (ConfigException ex1) {
              JOptionPane.showMessageDialog(this, ex1.getMessage(), "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+        }catch (DepuradorException ex2) {
+             JOptionPane.showMessageDialog(this, ex2.getMessage(), "Texto sin lexemas", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnRetrocederDepActionPerformed
 
@@ -1231,7 +1238,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         try {
 
             if (this.leerEntradas == null) {
-                JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador\nEscribe algo para poderlo depurar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "No hay texto registrado en el texto del analizador\nEscribe algo para poderlo depurar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -1239,14 +1246,16 @@ public class MenuPrincipal extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador para depurar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            
             this.leerEntradas.getLexerActual().obtenerModoDepuracion().avanzarSiguientePaso();
 
         } catch (NullPointerException ex) {
-            JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador\nEscribe algo para poderlo depurar", "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+            
+            JOptionPane.showMessageDialog(this, "No hay texto registrado en el analizador\nEscribe algo para poderlo depurar", "Documento Vacio", JOptionPane.ERROR_MESSAGE);
 
         } catch (ConfigException ex1) {
              JOptionPane.showMessageDialog(this, ex1.getMessage(), "Texto Vacio", JOptionPane.ERROR_MESSAGE);
+        }catch (DepuradorException ex2) {
+             JOptionPane.showMessageDialog(this, ex2.getMessage(), "Texto sin lexemas", JOptionPane.ERROR_MESSAGE);
         }
 
     }//GEN-LAST:event_btnAvanzarDepActionPerformed
