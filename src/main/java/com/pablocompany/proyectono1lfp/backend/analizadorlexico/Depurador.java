@@ -44,6 +44,12 @@ public class Depurador {
     //Atributo que indica que la depuracion ha terminado
     private boolean depuracionTerminada;
 
+    //Atributo comodin que permite evaluar cuando se ha decrementado el paso para evitar el delay
+    private boolean estaDecrementado;
+
+    //Atributo que permite evaluar cuando se ha regresado por completo el analisis al estado inicial
+    private boolean estaReiniciado;
+
     public Depurador(ArrayList<Sentencia> listaSentencias) {
         this.indiceSentencia = 0;
         this.indiceLexema = 0;
@@ -51,6 +57,9 @@ public class Depurador {
         this.listaSentencias = listaSentencias;
         this.yaTerminado = false;
         this.depuracionTerminada = false;
+
+        this.estaDecrementado = false;
+        this.estaReiniciado = false;
     }
 
     //Metodo que permite reniciar el depurador cuando se abandona el analisis
@@ -86,6 +95,16 @@ public class Depurador {
             this.yaTerminado = false;
             this.depuracionTerminada = false;
             return;
+        }
+
+        if (this.estaDecrementado) {
+            incrementarPaso();
+            this.estaDecrementado = false;
+        }
+
+        if (this.estaReiniciado) {
+            incrementarPaso();
+            this.estaReiniciado = false;
         }
 
         if (this.listaSentencias.get(this.indiceSentencia).getListaLexema(this.indiceLexema).getLexema().isBlank()) {
@@ -132,6 +151,49 @@ public class Depurador {
             throw new DepuradorException("No hay ningun lexema escrito");
         }
 
+        if (this.indiceSentencia == 0 && this.indiceLexema == 0 && this.indiceNodo == 0) {
+            ilustrarEstadosAutomata();
+            return;
+        }
+
+        if (!this.estaDecrementado) {
+            this.estaDecrementado = true;
+        }
+
+        decrementarPaso();
+
+        if (this.listaSentencias.get(this.indiceSentencia).getListaLexema(this.indiceLexema).getLexema().isBlank()) {
+            decrementarPaso();
+        }
+
+        ilustrarEstadosAutomata();
+
+    }
+
+    //Metodo que ayuda a decrementar el paso en la depuracion
+    private void decrementarPaso() {
+        if (this.indiceSentencia == 0 && this.indiceLexema == 0 && this.indiceNodo == 0) {
+            return;
+        }
+
+        this.indiceNodo--;
+
+        if (this.indiceNodo < 0) {
+            this.indiceLexema--;
+            if (this.indiceLexema >= 0) {
+                this.indiceNodo = this.listaSentencias.get(this.indiceSentencia).getListaLexema(this.indiceLexema).getLongitudNodo() - 1;
+            }
+        }
+
+        // Retroceder de lexemas
+        if (this.indiceLexema < 0) {
+            this.indiceSentencia--;
+            if (this.indiceSentencia >= 0) {
+                this.indiceLexema = this.listaSentencias.get(this.indiceSentencia).limiteLexemas() - 1;
+
+                this.indiceNodo = this.listaSentencias.get(this.indiceSentencia).getListaLexema(this.indiceLexema).getLongitudNodo() - 1;
+            }
+        }
     }
 
     //Metodo que permite regresar al estado incial del lexema
@@ -141,7 +203,23 @@ public class Depurador {
             throw new DepuradorException("No hay ningun lexema escrito");
         }
 
-        //PENDIENTISIMO
+        this.indiceNodo = 0;
+
+        Lexema lexemaEvaluado = this.listaSentencias.get(this.indiceSentencia).getListaLexema(this.indiceLexema);
+
+        if (lexemaEvaluado.getLexema().isBlank()) {
+            this.indiceLexema--;
+
+            if (this.indiceLexema < 0) {
+                this.indiceLexema = 0;
+            }
+        }
+
+        if (!this.estaReiniciado) {
+            this.estaReiniciado = true;
+        }
+
+        ilustrarEstadosAutomata();
     }
 
     //Metodo que permite viajar al estado final del lexema
