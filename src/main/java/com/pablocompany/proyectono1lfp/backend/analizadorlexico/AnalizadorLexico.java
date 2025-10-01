@@ -289,7 +289,7 @@ public class AnalizadorLexico {
                 return true;
             }
 
-            if (lexemaActual.getValorNodo(0).getCaracter() == '/' && lexemaActual.getValorNodo(1).getCaracter() != '/' && lexemaActual.getValorNodo(1).getCaracter() != '*') {
+            if (lexemaActual.getValorNodo(0).getCaracter() == this.automataFinitoDeterminista.getInicioComentario() && lexemaActual.getValorNodo(1).getCaracter() != '/' && lexemaActual.getValorNodo(1).getCaracter() != '*') {
 
                 int filaUbicacionLexema = lexemaActual.getPosicionLexema();
 
@@ -302,6 +302,7 @@ public class AnalizadorLexico {
                     lexemaUbicadoComentado.generalizarNodo(TokenEnum.ERROR);
                     lexemaUbicadoComentado.setYaDeclarado(true);
                     lexemaUbicadoComentado.setLexemaError(lexemaActual.getLexema() + " Formato no apropiado de comentario. NO TOKEN");
+                    lexemaUbicadoComentado.setCadenaEsperada("Se esperaba un " + TokenEnum.COMENTARIO_LINEA.getNombreToken());
                 }
 
                 return true;

@@ -95,5 +95,16 @@ public class AutomataDeterminista {
         return limpio.split("\\|");
     }
 
+    //Metodo que permite saber el primer valor de comentario
+    public char getInicioComentario() {
+
+        String limpio = ER_COMENTARIO.replaceAll("(^\\^|\\$$)", "");
+
+        String[] arreglo = limpio.split("(?!^)");
+        
+        return arreglo[0].charAt(0);
+
+    }
+
     //=====================FIN DEL APARTADO QUE PERMITE CONVERTIR EN ARREGLO LA EXPRESION REGULAR PARA PODERLA RECONOCER DESORDENADA===================
 }
