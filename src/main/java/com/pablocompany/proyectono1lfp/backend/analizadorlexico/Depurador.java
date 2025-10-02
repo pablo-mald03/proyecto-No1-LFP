@@ -141,7 +141,10 @@ public class Depurador {
         }
 
         if (this.listaSentencias.get(this.indiceSentencia).getListaLexema(this.indiceLexema).getLexema().isBlank()) {
-            incrementarPaso();
+            while (this.listaSentencias.get(this.indiceSentencia).getListaLexema(this.indiceLexema).getLexema().isBlank()) {
+                incrementarPaso();
+            }
+
         }
 
         ilustrarEstadosAutomata();
@@ -185,6 +188,12 @@ public class Depurador {
         }
 
         if (this.indiceSentencia == 0 && this.indiceLexema == 0 && this.indiceNodo == 0) {
+            
+            if (this.indiceSentencia == 0 && this.indiceLexema == 0 && this.indiceNodo == 0 && this.listaSentencias.get(this.indiceSentencia).getListaLexema(this.indiceLexema).getLexema().isBlank()) {
+                while (this.listaSentencias.get(this.indiceSentencia).getListaLexema(this.indiceLexema).getLexema().isBlank()) {
+                    incrementarPaso();
+                }
+            }
             ilustrarEstadosAutomata();
             return;
         }
@@ -214,16 +223,45 @@ public class Depurador {
             if (this.estaOmitido) {
                 this.estaOmitido = false;
             }
-            fueAfectado = true; 
+            fueAfectado = true;
 
         }
 
         if (!fueAfectado) {
             decrementarPaso();
+
+            if (this.indiceSentencia == 0 && this.indiceLexema == 0 && this.indiceNodo == 0 && this.listaSentencias.get(this.indiceSentencia).getListaLexema(this.indiceLexema).getLexema().isBlank()) {
+                while (this.listaSentencias.get(this.indiceSentencia).getListaLexema(this.indiceLexema).getLexema().isBlank()) {
+                    incrementarPaso();
+                }
+
+            }
+
         }
 
         if (this.listaSentencias.get(this.indiceSentencia).getListaLexema(this.indiceLexema).getLexema().isBlank()) {
-            decrementarPaso();
+
+            boolean seTermino = false;
+            while (this.listaSentencias.get(this.indiceSentencia).getListaLexema(this.indiceLexema).getLexema().isBlank()) {
+                decrementarPaso();
+
+                if (this.indiceSentencia == 0 && this.indiceLexema == 0 && this.indiceNodo == 0) {
+                    break;
+                }
+            }
+
+            if (seTermino) {
+                ilustrarEstadosAutomata();
+
+                if (this.listaSentencias.get(this.indiceSentencia).getListaLexema(this.indiceLexema).getLexema().isBlank()) {
+                    while (this.listaSentencias.get(this.indiceSentencia).getListaLexema(this.indiceLexema).getLexema().isBlank()) {
+                        incrementarPaso();
+                    }
+
+                }
+
+            }
+
         }
 
         ilustrarEstadosAutomata();
@@ -294,6 +332,13 @@ public class Depurador {
 
         if (!this.estaOmitido) {
             this.estaOmitido = true;
+        }
+
+        if (this.listaSentencias.get(this.indiceSentencia).getListaLexema(this.indiceLexema).getLexema().isBlank()) {
+            while (this.listaSentencias.get(this.indiceSentencia).getListaLexema(this.indiceLexema).getLexema().isBlank()) {
+                incrementarPaso();
+            }
+
         }
 
         ilustrarEstadosAutomata();
