@@ -485,8 +485,14 @@ public class AnalizadorLexico {
                 Nodo nodoEvaluado = lexemaEvaluado.getValorNodo(i);
 
                 insertarToken("Me movi del estado " + (i + 1) + " al estado " + (i + 2) + " con una ", colorEstados, this.logTransiciones);
+                
+                String palabraLexemaObtenida =  String.valueOf(nodoEvaluado.getCaracter());
 
-                insertarToken(String.valueOf(nodoEvaluado.getCaracter()), new Color(0x292724), this.logTransiciones);
+                if(palabraLexemaObtenida.isBlank()){
+                    palabraLexemaObtenida = "\'  \'";
+                }
+                
+                insertarToken(palabraLexemaObtenida, new Color(0x292724), this.logTransiciones);
 
                 insertarToken("\n", Color.BLACK, this.logTransiciones);
 

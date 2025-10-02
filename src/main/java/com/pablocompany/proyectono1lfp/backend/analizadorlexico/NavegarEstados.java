@@ -348,7 +348,7 @@ public class NavegarEstados {
         }
 
     }
-    
+
     //Metodo que permite avisar que hubo un erro en el lexema
     private void anunciarErrorCadena(Lexema lexemaError) {
         try {
@@ -396,7 +396,12 @@ public class NavegarEstados {
 
             insertarEstadoTransicion("Me movi del estado " + (indiceTransicion + 1) + " al estado " + (indiceTransicion + 2) + " con " + sujeto + " ", colorEstados, this.logTransicionesAFD);
 
-            insertarEstadoTransicion(String.valueOf(nodoEstado.getCaracter()), new Color(0x292724), this.logTransicionesAFD);
+            String palabraLexema = String.valueOf(nodoEstado.getCaracter());
+            
+            if(palabraLexema.isBlank()){
+                palabraLexema = "\'  \'";
+            }
+            insertarEstadoTransicion(palabraLexema, new Color(0x292724), this.logTransicionesAFD);
 
             insertarEstadoTransicion("\n", Color.BLACK, this.logTransicionesAFD);
 
